@@ -1,0 +1,6 @@
+name: Pathinator
+description: An "Inator" that makes making paths easy.
+version: ${project.version}
+api-version: 1.16
+author: HideTheMonkey
+main: com.hidethemonkey.pathinator.Pathinator

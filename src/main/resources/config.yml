@@ -1,0 +1,43 @@
+## Global configs
+pluginVersion: ${project.version}
+
+# enable or disable anonymous statistics collection with bStats.org
+# Please consider leaving this on. It doesn't collect any personal info
+# and it helps me keep track of overall usage patterns.
+enableStats: true
+
+## Configs for the path generator
+
+# The height and material to be cleared above the path
+clearance:
+  # Default number of blocks that will be replaced with AIR above the path
+  height: 3
+
+  # If you want to use a different material for the air block, you can do so here
+  material: AIR
+
+lighting:
+  # `interval` is the number of blocks between each lighting block. 12 is a good value for torches, as it keeps the light
+  # level at 7 or higher on the path. If you're using a brighter source, you might want to increase this value.
+  # If you place the torch higher up (like on a post), you might want to decrease this value.
+  interval: 12
+
+  # `stack` is an array of materials that will be placed next to the path if `with lighting` is enabled.
+  # The height of the stack cannot exceed the clearance height in Survival, but it can in Creative.
+  #
+  # Examples:
+  # stack: [DARK_OAK_FENCE, LANTERN]
+  # stack: [GLOWSTONE]
+  stack: [TORCH]
+
+survival:
+  # Determines if Pathinator is enabled in Survival mode.
+  enabled: true
+
+  # If set to `true` and player is in Survival, the appropriate tool will take 1 damage per block broken.
+  # If set to `false`, tools will not take damage.
+  #
+  # For example, if the path is replacing dirt, a shovel will take damage, but if the path is replacing stone,
+  # a pickaxe will take damage. This is dynamic based on the material of the block being replaced, and if there are multiple
+  # tools of the same type in the inventory, Pathinator will take damage from the tool with the least available durability.
+  toolDamage: true
