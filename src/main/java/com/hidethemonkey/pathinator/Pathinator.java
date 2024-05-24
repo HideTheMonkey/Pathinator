@@ -30,6 +30,8 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,11 +39,14 @@ import com.hidethemonkey.pathinator.commands.PathCommands;
 import com.hidethemonkey.pathinator.commands.BasicCommands;
 import com.hidethemonkey.pathinator.commands.CustomCommands;
 import com.hidethemonkey.pathinator.commands.TrackCommands;
+import com.hidethemonkey.pathinator.helpers.VersionChecker;
+import com.hidethemonkey.pathinator.helpers.VersionData;
 
 public class Pathinator extends JavaPlugin {
 
     private PathinatorConfig pConfig;
     private Metrics metrics;
+    private VersionData versionData;
 
     /**
      * 
@@ -49,6 +54,7 @@ public class Pathinator extends JavaPlugin {
     @Override
     public void onLoad() {
         CommandAPI.onLoad(new CommandAPIBukkitConfig(this).verboseOutput(false));
+        versionData = VersionChecker.getLatestReleaseVersion();
     }
 
     /**
@@ -61,6 +67,9 @@ public class Pathinator extends JavaPlugin {
         saveDefaultConfig();
 
         pConfig = new PathinatorConfig(getConfig());
+
+        // Check for new versions
+        compareVersions();
 
         // Store name on config for easy access later (not saved to file)
         pConfig.setPluginName(this.getName());
@@ -112,9 +121,33 @@ public class Pathinator extends JavaPlugin {
                 // The uploaded stats do not include any private information.
                 this.metrics = new Metrics(this, 21949);
             } else {
-                getLogger().info(
+                getLogger().warning(
                         "bStats is not enabled! Please consider activating this service to help me keep track of Pathinator usage. 🙇");
             }
+        }
+    }
+
+    /**
+     * 
+     */
+    private void compareVersions() {
+        if (versionData == null) {
+            getLogger().warning(
+                    "Could not check for new versions. Please see https://hangar.papermc.io/HideTheMonkey/Pathinator for updates.");
+            return;
+        }
+        DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(versionData.getVersion());
+        DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(getDescription().getVersion());
+        if (latestVersion.compareTo(currentVersion) > 0) {
+            getLogger().warning("**************************************************************");
+            getLogger().warning("* A new version of Pathinator is available!");
+            getLogger().warning("*");
+            getLogger().warning("* New version: " + versionData.getVersion());
+            getLogger().warning("* Your version: " + getDescription().getVersion());
+            getLogger().warning("*");
+            getLogger().warning("* Please update to take advantage of the latest features and bug fixes.");
+            getLogger().warning("* Download here: https://hangar.papermc.io/HideTheMonkey/Pathinator");
+            getLogger().warning("**************************************************************");
         }
     }
 
