@@ -33,12 +33,18 @@ import dev.jorel.commandapi.arguments.IntegerArgument;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
+
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.hidethemonkey.pathinator.commands.PathCommands;
 import com.hidethemonkey.pathinator.commands.BasicCommands;
 import com.hidethemonkey.pathinator.commands.CustomCommands;
 import com.hidethemonkey.pathinator.commands.TrackCommands;
+import com.hidethemonkey.pathinator.helpers.StringUtils;
 import com.hidethemonkey.pathinator.helpers.VersionChecker;
 import com.hidethemonkey.pathinator.helpers.VersionData;
 
@@ -77,6 +83,9 @@ public class Pathinator extends JavaPlugin {
         // Initialize bStats metrics 21949
         setupMetrics(pConfig);
 
+        // Register Player Join Listener
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+
         CommandAPI.onEnable();
 
         // CustomCommands custom = new CustomCommands(this, config);
@@ -111,6 +120,14 @@ public class Pathinator extends JavaPlugin {
 
     /**
      * 
+     * @return bstats metrics object
+     */
+    public Metrics getMetrics() {
+        return metrics;
+    }
+
+    /**
+     * 
      * @param config
      */
     private void setupMetrics(PathinatorConfig config) {
@@ -119,7 +136,35 @@ public class Pathinator extends JavaPlugin {
             if (config.getEnableStats()) {
                 // Please don't change the ID. This helps me keep track of generic usage data.
                 // The uploaded stats do not include any private information.
-                this.metrics = new Metrics(this, 21949);
+                metrics = new Metrics(this, 21949);
+
+                metrics.addCustomChart(new SimplePie("system_language", () -> {
+                    return System.getProperty("user.language") + "_" + System.getProperty("user.country").toUpperCase();
+                }));
+
+                metrics.addCustomChart(
+                        new SimplePie("config_clearance_height", () -> String.valueOf(pConfig.getClearance())));
+
+                metrics.addCustomChart(
+                        new SimplePie("config_clearance_material", () -> pConfig.getClearanceMaterial()));
+
+                metrics.addCustomChart(new SimplePie("config_lighting_interval",
+                        () -> String.valueOf(pConfig.getLightingInterval())));
+
+                metrics.addCustomChart(
+                        new SimplePie("config_lighting_stack", () -> pConfig.getLightingStack().toString()));
+
+                metrics.addCustomChart(new SimplePie("config_survival_enabled",
+                        () -> pConfig.getEnabledInSurvival() ? "true" : "false"));
+
+                metrics.addCustomChart(new SimplePie("config_require_tool",
+                        () -> pConfig.getRequireTool() ? "true" : "false"));
+
+                metrics.addCustomChart(new SimplePie("config_tool_damage",
+                        () -> pConfig.getTakeToolDamage() ? "true" : "false"));
+
+                metrics.addCustomChart(new SimplePie("config_keep_material",
+                        () -> pConfig.getKeepMaterial() ? "true" : "false"));
             } else {
                 getLogger().warning(
                         "bStats is not enabled! Please consider activating this service to help me keep track of Pathinator usage. 🙇");
@@ -151,4 +196,12 @@ public class Pathinator extends JavaPlugin {
         }
     }
 
+    public class PlayerJoinListener implements Listener {
+        @EventHandler
+        public void onPlayerJoin(PlayerJoinEvent event) {
+            getMetrics().addCustomChart(
+                    new SimplePie("player_locale",
+                            () -> String.valueOf(StringUtils.formatLocale(event.getPlayer().getLocale()))));
+        }
+    }
 }
