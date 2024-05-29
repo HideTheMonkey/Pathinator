@@ -99,6 +99,16 @@ public class PlayerHelper {
     }
 
     /**
+     * Check if the player is required to have the right tool
+     * to mine a block.
+     * 
+     * @return
+     */
+    public boolean requiresTools() {
+        return plugin.getPConfig().getRequireTool();
+    }
+
+    /**
      * Get the number of blocks in the player's inventory
      * 
      * @param block
@@ -202,6 +212,20 @@ public class PlayerHelper {
     public boolean removeBlock(Material material) {
         if (player.getInventory().contains(material)) {
             HashMap<Integer, ItemStack> items = player.getInventory().removeItem(new ItemStack(material, 1));
+            return items.isEmpty();
+        }
+        return true;
+    }
+
+    /**
+     * Give the player a block
+     * 
+     * @param material
+     * @return
+     */
+    public boolean giveBlock(Material material) {
+        if (plugin.getPConfig().getKeepMaterial()) {
+            HashMap<Integer, ItemStack> items = player.getInventory().addItem(new ItemStack(material, 1));
             return items.isEmpty();
         }
         return true;

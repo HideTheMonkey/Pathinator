@@ -148,7 +148,8 @@ public class BasicCommands {
                     "Requested " + requestedCount + " blocks of " + block.getType().name() + ", but only able to place "
                             + blockCount + ".");
         } else {
-            playerHelper.msg("Placed " + blockCount + " blocks of " + block.getType().name() + ".");
+            String prefix = playerHelper.isInSurvival() ? "Attempting to place " : "Placed ";
+            playerHelper.msg(prefix + blockCount + " blocks of " + block.getType().name() + ".");
         }
     }
 
