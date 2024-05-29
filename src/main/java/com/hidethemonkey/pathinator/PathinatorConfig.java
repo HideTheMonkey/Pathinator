@@ -132,6 +132,24 @@ public class PathinatorConfig {
     }
 
     /**
+     * Gets the keep material configuration value.
+     *
+     * @return true if keep material, false otherwise
+     */
+    public boolean getKeepMaterial() {
+        return config.getBoolean("survival.keepMaterial");
+    }
+
+    /**
+     * Gets the require tool configuration value.
+     *
+     * @return true if require tool, false otherwise
+     */
+    public boolean getRequireTool() {
+        return config.getBoolean("survival.requireTool");
+    }
+
+    /**
      * Updates the configuration file.
      *
      * @param plugin the JavaPlugin instance

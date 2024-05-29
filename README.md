@@ -12,6 +12,8 @@ _Only tested on Paper, but should work fine on Spigot and Bukkit servers too._
 
 In Survival mode, you must have enough material in your inventory to cover the distance requested. Additionally, in Survival each relevant tool in your inventory will take 1 damage for each block you replace (_including the clearance space above if carving through a mountain_). For example, if you have a shovel and a pickaxe and you create a path 10 blocks long through 6 blocks of dirt and 4 blocks of stone, your shovel will take 6 damage and your pickaxe will take 4 damage. If you have more than one tool of the same type, Pathinator will take the damage from the tool with the least remaining durability (_taking tool damage is configurable_).
 
+Additionally you can configure Pathinator to require the correct tools in order to automatically mine the blocks as well as retain the mined material in your inventory.
+
 In Creative mode, you can place as many blocks of any type as you want, with no inventory restrictions or damage to tools.
 
 ## Usage
@@ -38,8 +40,10 @@ lighting:
   stack: [TORCH]
 
 survival:
-  enabled: true
-  toolDamage: true
+  enabled: true|false
+  requireTool: true|false
+  toolDamage: true|false
+  keepMaterial: true|false
 
 ```
 

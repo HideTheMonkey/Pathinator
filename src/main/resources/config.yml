@@ -34,6 +34,11 @@ survival:
   # Determines if Pathinator is enabled in Survival mode.
   enabled: true
 
+  # If 'true', Pathinator will only mine a block if there is an appropriate tool in the player's inventory.
+  # If the player does not have the right tool, Pathinator will not mine the block and will stop the path generation.
+  # If 'false', Pathinator will mine the block regardless what is in the player's inventory.
+  requireTool: true
+
   # If set to `true` and player is in Survival, the appropriate tool will take 1 damage per block broken.
   # If set to `false`, tools will not take damage.
   #
@@ -41,3 +46,7 @@ survival:
   # a pickaxe will take damage. This is dynamic based on the material of the block being replaced, and if there are multiple
   # tools of the same type in the inventory, Pathinator will take damage from the tool with the least available durability.
   toolDamage: true
+
+  # If set to `true`, the player will receive the material that was broken when using Pathinator.
+  # Assuming of course there is room in the player's inventory.
+  keepMaterial: true

@@ -34,12 +34,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 
+import com.hidethemonkey.pathinator.Pathinator;
+
 public class BlockHelper {
 
     Plugin plugin;
 
-    public BlockHelper(Plugin plugin) {
-        this.plugin = plugin;
+    public BlockHelper(Pathinator pathPlugin) {
+        this.plugin = pathPlugin;
     }
 
     /**
@@ -84,15 +86,20 @@ public class BlockHelper {
 
             // Place the base block
             if (originalMaterial != data.getBaseMaterial() && playerHelper.hasBlock(data.getBaseMaterial())) {
-                block.setType(data.getBaseMaterial());
-
                 if (playerHelper.isInSurvival()) {
+                    ItemStack tool = playerHelper.getMineableTool(originalMaterial);
+                    if (tool == null && playerHelper.requiresTools()) {
+                        // Don't allow the block to be placed if the player doesn't have the right tool
+                        return;
+                    }
                     // Remove from inventory
                     playerHelper.removeBlock(data.getBaseMaterial());
                     // Apply damage to the appropriate tool in inventory
-                    ItemStack tool = playerHelper.getMineableTool(originalMaterial);
                     playerHelper.addToolDamage(tool, 1);
+                    // Add the mined material to the inventory
+                    playerHelper.giveBlock(originalMaterial);
                 }
+                block.setType(data.getBaseMaterial());
             }
 
             // Clear the air...
@@ -100,13 +107,19 @@ public class BlockHelper {
             for (int i = 1; i <= clearance; i++) {
                 Block blockToClear = data.getWorld().getBlockAt(x, y + i, z);
                 Material materialToClear = blockToClear.getType();
-                blockToClear.setType(data.getClearanceMaterial());
                 if (materialToClear != Material.AIR && materialToClear != Material.CAVE_AIR
                         && materialToClear != Material.WATER && playerHelper.isInSurvival()) {
-                    // Apply damage to the appropriate tool in inventory
                     ItemStack tool = playerHelper.getMineableTool(materialToClear);
+                    if (tool == null && playerHelper.requiresTools()) {
+                        // Don't allow the block to be placed if the player doesn't have the right tool
+                        continue;
+                    }
+                    // Apply damage to the appropriate tool in inventory
                     playerHelper.addToolDamage(tool, 1);
+                    // Add the mined material to the inventory
+                    playerHelper.giveBlock(materialToClear);
                 }
+                blockToClear.setType(data.getClearanceMaterial());
             }
 
             // Add some lights
@@ -118,14 +131,20 @@ public class BlockHelper {
                         lightingLocation.getBlockZ());
                 Material originalLightingBase = lightingBase.getType();
                 if (originalLightingBase != data.getBaseMaterial() && playerHelper.hasBlock(data.getBaseMaterial())) {
-                    lightingBase.setType(data.getBaseMaterial());
                     if (playerHelper.isInSurvival()) {
+                        ItemStack tool = playerHelper.getMineableTool(originalLightingBase);
+                        if (tool == null && playerHelper.requiresTools()) {
+                            // Don't allow the block to be placed if the player doesn't have the right tool
+                            return;
+                        }
                         // Remove from inventory
                         playerHelper.removeBlock(data.getBaseMaterial());
                         // Apply damage to the appropriate tool in inventory
-                        ItemStack tool = playerHelper.getMineableTool(originalLightingBase);
                         playerHelper.addToolDamage(tool, 1);
+                        // Add the mined material to the inventory
+                        playerHelper.giveBlock(originalLightingBase);
                     }
+                    lightingBase.setType(data.getBaseMaterial());
                 }
 
                 // Loop through the lighting stack and place the lighting materials
