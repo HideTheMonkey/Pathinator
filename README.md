@@ -6,7 +6,7 @@ Pathinator is a Minecraft plugin that allows you to quickly and easily create pa
 
 For example, if you are standing on a block of `OAK_PLANKS` and you issue a command to create a basic path of 50 blocks, Pathinator will replace all the blocks in the direction you are facing with `OAK_PLANKS` out to a distance of 50 blocks. If you also requested `with lights` Pathinator will add a light (_configurable, defaults to TORCH_) every N blocks (_defaults to 12_) to the side of the path.
 
-_Only tested on Paper, but should work fine on Spigot and Bukkit servers too._
+Available on [PaperMC](https://hangar.papermc.io/HideTheMonkey/Pathinator)! (_Only tested on Paper, but should work fine on Spigot and Bukkit servers too._)
 
 ## Creative vs Survival
 
