@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.hidethemonkey</groupId>
   <artifactId>Pathinator</artifactId>
-  <version>1.0.40</version>
+  <version>1.1.0</version>
   <packaging>jar</packaging>
   <name>Pathinator</name>
 

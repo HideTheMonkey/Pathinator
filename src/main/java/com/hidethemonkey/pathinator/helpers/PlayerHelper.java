@@ -146,6 +146,8 @@ public class PlayerHelper {
         }
 
         if (type.isEmpty()) {
+            // If the material doesn't match with a tool, return null
+            // so we can handle that differently.
             return null;
         }
 
@@ -167,7 +169,8 @@ public class PlayerHelper {
 
             return tools.get(0);
         }
-        return new ItemStack(material, 0);
+        // Player doesn't have a tool so pass back what it should be but with 0 amount.
+        return new ItemStack(Material.getMaterial("MINEABLE_" + type), 0);
     }
 
     /**
@@ -178,6 +181,10 @@ public class PlayerHelper {
      */
     public void addToolDamage(ItemStack item, int damage) {
         if (item != null && plugin.getPConfig().getTakeToolDamage()) {
+            String toolName = item.getType().name();
+            if (!toolName.contains("AXE") && !toolName.contains("SHOVEL") && !toolName.contains("HOE")) {
+                return;
+            }
             Damageable damageMeta = (Damageable) item.getItemMeta();
             damageMeta.setDamage(damageMeta.getDamage() + damage);
             item.setItemMeta(damageMeta);
@@ -185,7 +192,7 @@ public class PlayerHelper {
             if (item.getType().getMaxDurability() <= damageMeta.getDamage() + damage) {
                 player.getInventory().remove(item);
                 player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 3.0F, 0.69F); // giggity giggity
-                msg("Your " + item.getType().name() + " broke!");
+                msg("Your " + toolName + " broke!");
             }
         }
     }
