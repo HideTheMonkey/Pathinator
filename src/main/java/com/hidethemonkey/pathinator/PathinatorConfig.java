@@ -105,6 +105,15 @@ public class PathinatorConfig {
     }
 
     /**
+     * Gets the powered rail interval configuration value.
+     *
+     * @return the powered rail interval
+     */
+    public int getPoweredInterval() {
+        return config.getInt("tracks.powerInterval");
+    }
+
+    /**
      * Gets the clearance material configuration value.
      *
      * @return the clearance material as a string

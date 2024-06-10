@@ -66,85 +66,73 @@ public class BlockHelper {
     }
 
     /**
+     * Mine and replace a block
+     * 
+     * @param toPlace
+     * @param block
+     * @param ph
+     * @return
+     */
+    private boolean mineAndReplace(Material toPlace, Block block, PlayerHelper ph) {
+        Material toRemove = block.getType();
+        if (toRemove != toPlace && ph.hasBlock(toPlace)) {
+            if (ph.isInSurvival()) {
+                // ** Handle tool damage **
+                if (!toRemove.isAir() && toRemove != Material.WATER && toRemove.getHardness() >= 0.5) {
+                    ItemStack tool = ph.getMineableTool(toRemove);
+                    if (tool != null && tool.getAmount() == 0 && ph.requiresTools()) {
+                        // Don't allow the block to be placed if the player doesn't have the right tool
+                        return false;
+                    }
+                    // Apply damage to the appropriate tool in inventory
+                    ph.addToolDamage(tool, 1);
+                }
+                // ** Always remove from inventory **
+                ph.removeBlock(toPlace);
+                // ** Add the mined material to the inventory **
+                ph.giveBlock(toRemove);
+            }
+            block.setType(toPlace);
+        }
+        return true;
+    }
+
+    /**
      * Place a block at the specified location
      * 
      * @param data
      * @param delay
      * @param playerHelper
      */
-    public void placeBlock(final SegmentData data, final int delay, PlayerHelper playerHelper) {
+    public void placeBlock(final SegmentData data, final int delay, final PlayerHelper playerHelper) {
         Location location = data.getBaseLocation();
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();
-        Block block = data.getWorld().getBlockAt(x, y, z);
+        Block baseBlock = data.getWorld().getBlockAt(x, y, z);
 
         // Schedule the block placement
         Bukkit.getScheduler().runTaskLater(this.plugin, task -> {
 
-            Material originalMaterial = block.getType();
-
             // Place the base block
-            if (originalMaterial != data.getBaseMaterial() && playerHelper.hasBlock(data.getBaseMaterial())) {
-                if (playerHelper.isInSurvival()) {
-                    ItemStack tool = playerHelper.getMineableTool(originalMaterial);
-                    if (tool == null && playerHelper.requiresTools()) {
-                        // Don't allow the block to be placed if the player doesn't have the right tool
-                        return;
-                    }
-                    // Remove from inventory
-                    playerHelper.removeBlock(data.getBaseMaterial());
-                    // Apply damage to the appropriate tool in inventory
-                    playerHelper.addToolDamage(tool, 1);
-                    // Add the mined material to the inventory
-                    playerHelper.giveBlock(originalMaterial);
-                }
-                block.setType(data.getBaseMaterial());
-            }
+            mineAndReplace(data.getBaseMaterial(), baseBlock, playerHelper);
 
             // Clear the air...
             int clearance = data.getClearance();
             for (int i = 1; i <= clearance; i++) {
-                Block blockToClear = data.getWorld().getBlockAt(x, y + i, z);
-                Material materialToClear = blockToClear.getType();
-                if (materialToClear != Material.AIR && materialToClear != Material.CAVE_AIR
-                        && materialToClear != Material.WATER && playerHelper.isInSurvival()) {
-                    ItemStack tool = playerHelper.getMineableTool(materialToClear);
-                    if (tool == null && playerHelper.requiresTools()) {
-                        // Don't allow the block to be placed if the player doesn't have the right tool
-                        continue;
-                    }
-                    // Apply damage to the appropriate tool in inventory
-                    playerHelper.addToolDamage(tool, 1);
-                    // Add the mined material to the inventory
-                    playerHelper.giveBlock(materialToClear);
+                Block airBlock = data.getWorld().getBlockAt(x, y + i, z);
+                if (!mineAndReplace(data.getClearanceMaterial(), airBlock, playerHelper)) {
+                    continue;
                 }
-                blockToClear.setType(data.getClearanceMaterial());
             }
 
             // Add some lights
             if (data.getUseLighting()) {
                 Location lightingLocation = data.getLightingLocation();
                 // Make sure it has a base to stand on
-                Block lightingBase = data.getWorld().getBlockAt(lightingLocation.getBlockX(),
-                        lightingLocation.getBlockY(),
-                        lightingLocation.getBlockZ());
-                Material originalLightingBase = lightingBase.getType();
-                if (originalLightingBase != data.getBaseMaterial() && playerHelper.hasBlock(data.getBaseMaterial())) {
-                    if (playerHelper.isInSurvival()) {
-                        ItemStack tool = playerHelper.getMineableTool(originalLightingBase);
-                        if (tool == null && playerHelper.requiresTools()) {
-                            // Don't allow the block to be placed if the player doesn't have the right tool
-                            return;
-                        }
-                        // Remove from inventory
-                        playerHelper.removeBlock(data.getBaseMaterial());
-                        // Apply damage to the appropriate tool in inventory
-                        playerHelper.addToolDamage(tool, 1);
-                        // Add the mined material to the inventory
-                        playerHelper.giveBlock(originalLightingBase);
-                    }
-                    lightingBase.setType(data.getBaseMaterial());
+                Block lightingBase = data.getWorld().getBlockAt(lightingLocation);
+                if (!mineAndReplace(data.getBaseMaterial(), lightingBase, playerHelper)) {
+                    return;
                 }
 
                 // Loop through the lighting stack and place the lighting materials
@@ -153,20 +141,40 @@ public class BlockHelper {
                             lightingLocation.getBlockY() + i + 1,
                             lightingLocation.getBlockZ());
                     Material lighting = data.getLightingStacks().get(i).getType();
-                    if (playerHelper.isInSurvival()) {
-                        if (playerHelper.hasBlock(lighting)) {
-                            lightBlock.setType(lighting);
-                            // Remove from inventory
-                            playerHelper.removeBlock(lighting);
-                        }
-                    } else {
-                        lightBlock.setType(lighting);
+                    if (!mineAndReplace(lighting, lightBlock, playerHelper)) {
+                        continue;
                     }
-
                 }
             }
 
         }, delay);
+
+        // Add Rails
+        if (data.getUseRails()) {
+            Bukkit.getScheduler().runTaskLater(this.plugin, task -> {
+                // railBlock is the block above the just placed base block
+                // and as such should always be AIR
+                Block railBlock = data.getWorld().getBlockAt(x, y + 1, z);
+                Material railMaterial = data.getUsePower() ? Material.POWERED_RAIL : Material.RAIL;
+                mineAndReplace(railMaterial, railBlock, playerHelper);
+
+                // Add power if needed
+                if (data.getUsePower()) {
+                    Location powerLocation = data.getPowerLocation();
+                    // Make sure the REDSTONE_TORCH has a base to stand on
+                    Block baseForRedstoneTorch = data.getWorld().getBlockAt(powerLocation);
+                    if (!mineAndReplace(data.getBaseMaterial(), baseForRedstoneTorch, playerHelper)) {
+                        return;
+                    }
+                    Block redstoneTorchBlock = data.getWorld().getBlockAt(powerLocation.getBlockX(),
+                            powerLocation.getBlockY() + 1,
+                            powerLocation.getBlockZ());
+                    if (!mineAndReplace(Material.REDSTONE_TORCH, redstoneTorchBlock, playerHelper)) {
+                        return;
+                    }
+                }
+            }, delay + 2);
+        }
     }
 
     /**
@@ -181,20 +189,21 @@ public class BlockHelper {
      * @param facing
      */
     public void adjustLocationForward(Location location, BlockFace facing) {
-        if (facing == BlockFace.EAST || facing == BlockFace.WEST) {
-            if (facing == BlockFace.WEST) {
+        switch (facing) {
+            case WEST:
                 location.setX(location.getX() - 1);
-            } else {
+                break;
+            case EAST:
                 location.setX(location.getX() + 1);
-            }
-        }
-
-        if (facing == BlockFace.NORTH || facing == BlockFace.SOUTH) {
-            if (facing == BlockFace.SOUTH) {
-                location.setZ(location.getZ() + 1);
-            } else {
+                break;
+            case NORTH:
                 location.setZ(location.getZ() - 1);
-            }
+                break;
+            case SOUTH:
+                location.setZ(location.getZ() + 1);
+                break;
+            default:
+                break;
         }
     }
 
@@ -216,7 +225,7 @@ public class BlockHelper {
      * @return
      */
     public static BlockFace rotate90(BlockFace facing, boolean counterClockwise) {
-        BlockFace newFacing = facing;
+        BlockFace newFacing;
 
         switch (facing) {
             case EAST:

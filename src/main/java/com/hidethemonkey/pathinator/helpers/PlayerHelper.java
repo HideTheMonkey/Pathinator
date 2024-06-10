@@ -146,6 +146,8 @@ public class PlayerHelper {
         }
 
         if (type.isEmpty()) {
+            // If the material doesn't match with a tool, return null
+            // so we can handle that differently.
             return null;
         }
 
@@ -167,7 +169,14 @@ public class PlayerHelper {
 
             return tools.get(0);
         }
-        return null;
+        // Player doesn't have a tool so pass back a wooden version, but with 0 amount.
+        // This is done so we know the material requires a tool but the player just
+        // doesn't have one.
+        Material fakeTool = Material.getMaterial("WOODEN_" + type);
+        if (fakeTool == null) {
+            fakeTool = material;
+        }
+        return new ItemStack(fakeTool, 0);
     }
 
     /**
@@ -177,15 +186,21 @@ public class PlayerHelper {
      * @param damage
      */
     public void addToolDamage(ItemStack item, int damage) {
-        if (item != null && plugin.getPConfig().getTakeToolDamage()) {
+        if (item != null && item.getAmount() > 0 && plugin.getPConfig().getTakeToolDamage()) {
+            String toolName = item.getType().name();
+            if (!toolName.contains("AXE") && !toolName.contains("SHOVEL") && !toolName.contains("HOE")) {
+                return; // item is not a tool
+            }
             Damageable damageMeta = (Damageable) item.getItemMeta();
             damageMeta.setDamage(damageMeta.getDamage() + damage);
             item.setItemMeta(damageMeta);
 
             if (item.getType().getMaxDurability() <= damageMeta.getDamage() + damage) {
-                player.getInventory().remove(item);
-                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 3.0F, 0.69F); // giggity giggity
-                msg("Your " + item.getType().name() + " broke!");
+                if (player.getInventory().contains(item)) {
+                    player.getInventory().remove(item);
+                    player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 3.0F, 0.69F); // giggity giggity
+                    msg("Your " + toolName + " broke!");
+                }
             }
         }
     }
@@ -198,7 +213,7 @@ public class PlayerHelper {
      */
     public boolean hasBlock(Material material) {
         if (isInSurvival()) {
-            return player.getInventory().contains(material);
+            return player.getInventory().contains(material) || material.isAir();
         }
         return true;
     }

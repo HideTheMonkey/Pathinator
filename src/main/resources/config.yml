@@ -50,3 +50,8 @@ survival:
   # If set to `true`, the player will receive the material that was broken when using Pathinator.
   # Assuming of course there is room in the player's inventory.
   keepMaterial: true
+
+tracks:
+  # The interval between each powered rail. e.g. a value of 34 will place a powered rail every 34 blocks,
+  # with 33 blocks of regular rail in between.
+  powerInterval: 34
