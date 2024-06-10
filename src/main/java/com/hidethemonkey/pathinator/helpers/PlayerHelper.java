@@ -169,8 +169,12 @@ public class PlayerHelper {
 
             return tools.get(0);
         }
-        // Player doesn't have a tool so pass back what it should be but with 0 amount.
-        return new ItemStack(Material.getMaterial("MINEABLE_" + type), 0);
+        // Player doesn't have a tool so pass back a wooden version, but with 0 amount.
+        Material fakeTool = Material.getMaterial("WOODEN_" + type);
+        if (fakeTool == null) {
+            fakeTool = material;
+        }
+        return new ItemStack(fakeTool, 0);
     }
 
     /**
