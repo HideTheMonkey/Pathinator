@@ -167,7 +167,7 @@ public class PlayerHelper {
 
             return tools.get(0);
         }
-        return null;
+        return new ItemStack(material, 0);
     }
 
     /**
@@ -198,7 +198,7 @@ public class PlayerHelper {
      */
     public boolean hasBlock(Material material) {
         if (isInSurvival()) {
-            return player.getInventory().contains(material);
+            return player.getInventory().contains(material) || material.isAir();
         }
         return true;
     }

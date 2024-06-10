@@ -47,8 +47,6 @@ public class BasicCommands {
 
     private Pathinator plugin;
     private PathinatorConfig config;
-    private BlockHelper blockHelper;
-    private PlayerHelper playerHelper;
 
     public BasicCommands(Pathinator pathPlugin) {
         this.plugin = pathPlugin;
@@ -63,7 +61,7 @@ public class BasicCommands {
 
     public void basicPath(CommandSender sender, CommandArguments args) {
         Player player = (Player) sender;
-        playerHelper = new PlayerHelper(player, plugin);
+        PlayerHelper playerHelper = new PlayerHelper(player, plugin);
 
         // Check if the player is in the correct game mode
         if (playerHelper.isInAdventure() || playerHelper.isInSpectator()) {
@@ -76,7 +74,7 @@ public class BasicCommands {
             return;
         }
 
-        blockHelper = new BlockHelper(plugin);
+        BlockHelper blockHelper = new BlockHelper(plugin);
 
         // Find the block under the player
         Block block = blockHelper.getBlockUnderPlayer(player);

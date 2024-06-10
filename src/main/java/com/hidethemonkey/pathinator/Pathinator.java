@@ -80,16 +80,13 @@ public class Pathinator extends JavaPlugin {
         // Store name on config for easy access later (not saved to file)
         pConfig.setPluginName(this.getName());
 
-        // Initialize bStats metrics 21949
+        // Initialize bStats metrics
         setupMetrics(pConfig);
 
         // Register Player Join Listener
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
 
         CommandAPI.onEnable();
-
-        // CustomCommands custom = new CustomCommands(this, config);
-        // TrackCommands tracks = new TrackCommands(this, config);
 
         // Create basic path command
         BasicCommands basic = new BasicCommands(this);
@@ -99,6 +96,19 @@ public class Pathinator extends JavaPlugin {
                 .withOptionalArguments(new BooleanArgument(PathCommands.WITH_LIGHTS))
                 .executesPlayer(basic::basicPath)
                 .register();
+
+        // Create track path command
+        TrackCommands track = new TrackCommands(this);
+        new CommandAPICommand(PathCommands.TRACKS)
+                .withAliases("pt")
+                .withArguments(new IntegerArgument(PathCommands.DISTANCE))
+                .withOptionalArguments(new BooleanArgument(PathCommands.WITH_POWER))
+                .withOptionalArguments(new BooleanArgument(PathCommands.WITH_LIGHTS))
+                .executesPlayer(track::tracksPath)
+                .register();
+
+        // Create custom path command
+        // CustomCommands custom = new CustomCommands(this, config);
     }
 
     /**
@@ -165,6 +175,9 @@ public class Pathinator extends JavaPlugin {
 
                 metrics.addCustomChart(new SimplePie("config_keep_material",
                         () -> pConfig.getKeepMaterial() ? "true" : "false"));
+
+                metrics.addCustomChart(new SimplePie("config_powered_interval",
+                        () -> Integer.toString(pConfig.getPoweredInterval())));
             } else {
                 getLogger().warning(
                         "bStats is not enabled! Please consider activating this service to help me keep track of Pathinator usage. 🙇");

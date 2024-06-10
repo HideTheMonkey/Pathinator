@@ -24,7 +24,7 @@
 
 package com.hidethemonkey.pathinator.commands;
 
-public class PathCommands {
+public abstract class PathCommands {
 
     // primary commands
     public static final String BASIC = "path:basic";
@@ -34,5 +34,6 @@ public class PathCommands {
     // parameters
     public static final String DISTANCE = "distance";
     public static final String WITH_LIGHTS = "with lights";
+    public static final String WITH_POWER = "with power";
 
 }

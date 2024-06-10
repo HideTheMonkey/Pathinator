@@ -38,11 +38,18 @@ public class SegmentData {
     private Location baseLocation;
     private World world;
     private int clearance;
+    private BlockFace baseFacing;
+    // Lighing
+    private BlockFace lightFacing;
     private Location lightingLocation;
     private ArrayList<ItemStack> lightingItems;
-    private BlockFace baseFacing;
-    private BlockFace lightFacing;
     private boolean useLighting = false;
+    // Power Rails
+    private BlockFace powerFacing;
+    private boolean usePower = false;
+    private Location powerLocation;
+    // Rails
+    private boolean useRails = false;
 
     /**
      * Default constructor for SegmentData.
@@ -107,6 +114,24 @@ public class SegmentData {
     }
 
     /**
+     * Checks if the segment uses rails.
+     *
+     * @return true if the segment uses rails, false otherwise
+     */
+    public boolean getUseRails() {
+        return useRails;
+    }
+
+    /**
+     * Sets the segment to use rails.
+     *
+     * @param layTracks the new use rails
+     */
+    public void setUseRails(boolean layTracks) {
+        useRails = layTracks;
+    }
+
+    /**
      * Gets the base location of the segment.
      *
      * @return the base location
@@ -160,6 +185,16 @@ public class SegmentData {
     public void setBaseFacing(BlockFace facing) {
         this.baseFacing = facing;
         this.lightFacing = BlockHelper.rotate90(facing);
+        this.powerFacing = BlockHelper.rotate90(facing, true);
+    }
+
+    /**
+     * Gets the power facing direction of the segment.
+     *
+     * @return the power facing direction
+     */
+    public BlockFace getPowerFacing() {
+        return powerFacing;
     }
 
     /**
@@ -201,14 +236,6 @@ public class SegmentData {
     }
 
     /**
-     * Clears the lighting of the segment.
-     */
-    public void clearLighting() {
-        useLighting = false;
-        lightingLocation = null;
-    }
-
-    /**
      * Gets the lighting location of the segment.
      *
      * @return the lighting location
@@ -224,5 +251,30 @@ public class SegmentData {
      */
     public boolean getUseLighting() {
         return useLighting;
+    }
+
+    /**
+     * Gets if the segment should use powered rails.
+     */
+    public boolean getUsePower() {
+        return usePower;
+    }
+
+    /**
+     * Sets the segment to use powered rails.
+     */
+    public void addPower() {
+        usePower = true;
+        powerLocation = baseLocation.clone();
+        powerLocation.add(powerFacing.getModX(), powerFacing.getModY(), powerFacing.getModZ());
+    }
+
+    /**
+     * Gets the power location of the segment.
+     *
+     * @return the power location
+     */
+    public Location getPowerLocation() {
+        return powerLocation;
     }
 }

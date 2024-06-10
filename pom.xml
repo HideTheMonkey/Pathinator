@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.hidethemonkey</groupId>
   <artifactId>Pathinator</artifactId>
-  <version>1.0.4</version>
+  <version>1.0.40</version>
   <packaging>jar</packaging>
   <name>Pathinator</name>
 
@@ -56,7 +56,7 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
-      <version>3.9.6</version>
+      <version>3.9.7</version>
     </dependency>
   </dependencies>
 
