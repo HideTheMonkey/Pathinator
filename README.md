@@ -4,7 +4,7 @@
 
 Pathinator is a Minecraft plugin that allows you to quickly and easily create paths based on the block you are currently standing on.
 
-For example, if you are standing on a block of `OAK_PLANKS` and you issue a command to create a basic path of 50 blocks, Pathinator will replace all the blocks in the direction you are facing with `OAK_PLANKS` out to a distance of 50 blocks. If you also requested `with lights` Pathinator will add a light (_configurable, defaults to TORCH_) every N blocks (_defaults to 12_) to the side of the path.
+For example, if you are standing on a block of `OAK_PLANKS` and you issue a command to create a path of 50 blocks, Pathinator will replace all the blocks in the direction you are facing with `OAK_PLANKS` out to a distance of 50 blocks. If you also requested `with lights` Pathinator will add a light (_configurable, defaults to TORCH_) every N<sup>\*</sup> blocks to the side of the path.
 
 Available on [PaperMC](https://hangar.papermc.io/HideTheMonkey/Pathinator)! (_Only tested on Paper, but should work fine on Spigot and Bukkit servers too._)
 
@@ -18,9 +18,17 @@ In Creative mode, you can place as many blocks of any type as you want, with no 
 
 ## Usage
 
-`path:basic <distance> [with lights]` where \<distance\> is the number of blocks to place, and [with lights] is an optional boolean `true|false` whether to place a light every N number of blocks. (_N is configurable in the plugin config.yml_)
+#### Basic
+
+`path:basic <distance> [with lights]` where \<distance\> is the number of blocks to place, and [with lights] is an optional boolean `true|false` whether to place a light every N<sup>\*</sup> number of blocks.
 
 For example: `path:basic 25 true` to create a path 25 blocks long with lights, or `path:basic 25` where [with lights] defaults to false for no lights.
+
+#### Tracks
+
+`path:tracks <distance> [with power] [with lights]` where \<distance\> is the number of blocks to place, and [with power] is an optional boolean `true|false` whether to place a powered rail every N<sup>\*</sup> number of blocks. [with lights] is another optional boolean whether to place a light every N<sup>\*</sup> number of blocks.
+
+<sup>\*</sup> _N is configurable in `/plugins/Pathinator/config.yml`_
 
 ## Examples
 
@@ -28,7 +36,7 @@ For example: `path:basic 25 true` to create a path 25 blocks long with lights, o
 
 ## Configuration
 
-Once loaded on the server, you can edit the `/plugins/Pathinator/config.yml` to adjust the default values.
+Once loaded on the server, you can edit `/plugins/Pathinator/config.yml` to adjust the default values.
 
 ```
 clearance:
@@ -45,6 +53,9 @@ survival:
   toolDamage: true|false
   keepMaterial: true|false
 
+tracks:
+  powerInterval: 34
+
 ```
 
 ## Building from Source
@@ -59,7 +70,7 @@ _The metrics can be disabled in config.yml if you really want, but please consid
 
 ## Future Updates
 
-- Add option to create a path with rail tracks `path:tracks ...`
+- ~~Add option to create a path with rail tracks `path:tracks ...`~~ (v1.1.0)
 - Add option to customize aspects of the path (height, width, material, etc...) `path:custom ...`
 - Add option to follow the natural terrain instead of laying it all on the same Y value.
 - Add permissions management with LuckPerms
