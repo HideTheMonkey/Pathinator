@@ -77,20 +77,19 @@ public class BlockHelper {
         Material toRemove = block.getType();
         if (toRemove != toPlace && ph.hasBlock(toPlace)) {
             if (ph.isInSurvival()) {
-                // Handle tool damage
+                // ** Handle tool damage **
                 if (!toRemove.isAir() && toRemove != Material.WATER && toRemove.getHardness() >= 0.5) {
                     ItemStack tool = ph.getMineableTool(toRemove);
                     if (tool != null && tool.getAmount() == 0 && ph.requiresTools()) {
                         // Don't allow the block to be placed if the player doesn't have the right tool
-                        // ph.msg("You need a tool to mine " + toRemove);
                         return false;
                     }
                     // Apply damage to the appropriate tool in inventory
                     ph.addToolDamage(tool, 1);
                 }
-                // Always remove from inventory
+                // ** Always remove from inventory **
                 ph.removeBlock(toPlace);
-                // Add the mined material to the inventory
+                // ** Add the mined material to the inventory **
                 ph.giveBlock(toRemove);
             }
             block.setType(toPlace);

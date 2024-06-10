@@ -170,6 +170,8 @@ public class PlayerHelper {
             return tools.get(0);
         }
         // Player doesn't have a tool so pass back a wooden version, but with 0 amount.
+        // This is done so we know the material requires a tool but the player just
+        // doesn't have one.
         Material fakeTool = Material.getMaterial("WOODEN_" + type);
         if (fakeTool == null) {
             fakeTool = material;
@@ -184,7 +186,7 @@ public class PlayerHelper {
      * @param damage
      */
     public void addToolDamage(ItemStack item, int damage) {
-        if (item != null && plugin.getPConfig().getTakeToolDamage()) {
+        if (item != null && item.getAmount() > 0 && plugin.getPConfig().getTakeToolDamage()) {
             String toolName = item.getType().name();
             if (!toolName.contains("AXE") && !toolName.contains("SHOVEL") && !toolName.contains("HOE")) {
                 return; // item is not a tool
