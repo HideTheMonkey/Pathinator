@@ -187,16 +187,18 @@ public class PlayerHelper {
         if (item != null && plugin.getPConfig().getTakeToolDamage()) {
             String toolName = item.getType().name();
             if (!toolName.contains("AXE") && !toolName.contains("SHOVEL") && !toolName.contains("HOE")) {
-                return;
+                return; // item is not a tool
             }
             Damageable damageMeta = (Damageable) item.getItemMeta();
             damageMeta.setDamage(damageMeta.getDamage() + damage);
             item.setItemMeta(damageMeta);
 
             if (item.getType().getMaxDurability() <= damageMeta.getDamage() + damage) {
-                player.getInventory().remove(item);
-                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 3.0F, 0.69F); // giggity giggity
-                msg("Your " + toolName + " broke!");
+                if (player.getInventory().contains(item)) {
+                    player.getInventory().remove(item);
+                    player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 3.0F, 0.69F); // giggity giggity
+                    msg("Your " + toolName + " broke!");
+                }
             }
         }
     }
