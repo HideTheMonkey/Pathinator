@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.hidethemonkey</groupId>
   <artifactId>Pathinator</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
   <packaging>jar</packaging>
   <name>Pathinator</name>
 
@@ -31,13 +31,13 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.20.4-R0.1-SNAPSHOT</version>
+      <version>1.20.6-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <!-- https://commandapi.jorel.dev/9.4.0/setup_dev.html -->
     <dependency>
       <groupId>dev.jorel</groupId>
-      <artifactId>commandapi-bukkit-shade</artifactId>
+      <artifactId>commandapi-bukkit-shade-mojang-mapped</artifactId>
       <version>9.4.2</version>
     </dependency>
     <!-- https://bstats.org/getting-started/include-metrics -->
