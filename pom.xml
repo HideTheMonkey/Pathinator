@@ -37,7 +37,7 @@
     <!-- https://commandapi.jorel.dev/9.4.0/setup_dev.html -->
     <dependency>
       <groupId>dev.jorel</groupId>
-      <artifactId>commandapi-bukkit-shade-mojang-mapped</artifactId>
+      <artifactId>commandapi-bukkit-shade</artifactId>
       <version>9.4.2</version>
     </dependency>
     <!-- https://bstats.org/getting-started/include-metrics -->
@@ -115,7 +115,7 @@
           <configuration>
             <archive>
               <manifestEntries>
-                <paperweight-mappings-namespace>mojang</paperweight-mappings-namespace>
+                <paperweight-mappings-namespace>spigot</paperweight-mappings-namespace>
               </manifestEntries>
             </archive>
           </configuration>
