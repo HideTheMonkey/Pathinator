@@ -54,23 +54,52 @@ public abstract class PathCommands {
     protected Pathinator plugin;
     protected PathinatorConfig config;
 
+    /**
+     * Constructor for PathCommands.
+     *
+     * @param pathPlugin The Pathinator plugin instance.
+     */
     public PathCommands(Pathinator pathPlugin) {
         this.plugin = pathPlugin;
         this.config = pathPlugin.getPConfig();
     }
 
+    /**
+     * Gets the distance argument from the command arguments.
+     *
+     * @param args The command arguments.
+     * @return The distance argument, or 0 if not provided.
+     */
     protected Integer getDistance(CommandArguments args) {
         return (Integer) args.getOrDefault(DISTANCE, 0);
     }
 
+    /**
+     * Gets the withLights argument from the command arguments.
+     *
+     * @param args The command arguments.
+     * @return The withLights argument, or false if not provided.
+     */
     protected boolean getWithLights(CommandArguments args) {
         return (boolean) args.getOrDefault(WITH_LIGHTS, false);
     }
 
+    /**
+     * Gets the withPower argument from the command arguments.
+     *
+     * @param args The command arguments.
+     * @return The withPower argument, or false if not provided.
+     */
     protected boolean getWithPower(CommandArguments args) {
         return (boolean) args.getOrDefault(WITH_POWER, false);
     }
 
+    /**
+     * Checks if the player is in the correct game mode.
+     *
+     * @param playerHelper The player helper instance.
+     * @return True if the player is in the correct game mode, false otherwise.
+     */
     protected boolean modeCheck(PlayerHelper playerHelper) {
         // Check if the player is in the correct game mode
         if (playerHelper.isInAdventure() || playerHelper.isInSpectator()) {
@@ -85,6 +114,13 @@ public abstract class PathCommands {
         return true;
     }
 
+    /**
+     * Finds the target block for the path.
+     *
+     * @param blockHelper  The block helper instance.
+     * @param playerHelper The player helper instance.
+     * @return The target block, or null if not found.
+     */
     protected Block findTargetBlock(BlockHelper blockHelper, PlayerHelper playerHelper) {
         Block block = blockHelper.getBlockUnderPlayer(playerHelper.getPlayer());
         Material blockMaterial = block.getBlockData().getMaterial();
@@ -95,6 +131,13 @@ public abstract class PathCommands {
         return block;
     }
 
+    /**
+     * Gets the lighting stack for the path.
+     *
+     * @param args         The command arguments.
+     * @param playerHelper The player helper instance.
+     * @return The lighting stack.
+     */
     protected ArrayList<ItemStack> getLightingStack(CommandArguments args, PlayerHelper playerHelper) {
         ArrayList<ItemStack> lightingStack = new ArrayList<ItemStack>();
         if (getWithLights(args)) {
@@ -116,6 +159,12 @@ public abstract class PathCommands {
         return lightingStack;
     }
 
+    /**
+     * Creates a path.
+     *
+     * @param sender The command sender.
+     * @param args   The command arguments.
+     */
     public abstract void createPath(CommandSender sender, CommandArguments args);
 
 }
