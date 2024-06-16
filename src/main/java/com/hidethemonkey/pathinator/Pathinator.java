@@ -94,7 +94,7 @@ public class Pathinator extends JavaPlugin {
                 .withAliases("pb")
                 .withArguments(new IntegerArgument(PathCommands.DISTANCE))
                 .withOptionalArguments(new BooleanArgument(PathCommands.WITH_LIGHTS))
-                .executesPlayer(basic::basicPath)
+                .executesPlayer(basic::createPath)
                 .register();
 
         // Create track path command
@@ -104,7 +104,7 @@ public class Pathinator extends JavaPlugin {
                 .withArguments(new IntegerArgument(PathCommands.DISTANCE))
                 .withOptionalArguments(new BooleanArgument(PathCommands.WITH_POWER))
                 .withOptionalArguments(new BooleanArgument(PathCommands.WITH_LIGHTS))
-                .executesPlayer(track::tracksPath)
+                .executesPlayer(track::createPath)
                 .register();
 
         // Create custom path command

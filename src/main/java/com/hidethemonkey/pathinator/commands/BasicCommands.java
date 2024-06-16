@@ -27,7 +27,6 @@ package com.hidethemonkey.pathinator.commands;
 import dev.jorel.commandapi.executors.CommandArguments;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -38,19 +37,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.hidethemonkey.pathinator.Pathinator;
-import com.hidethemonkey.pathinator.PathinatorConfig;
 import com.hidethemonkey.pathinator.helpers.BlockHelper;
 import com.hidethemonkey.pathinator.helpers.PlayerHelper;
 import com.hidethemonkey.pathinator.helpers.SegmentData;
 
-public class BasicCommands {
-
-    private Pathinator plugin;
-    private PathinatorConfig config;
+public class BasicCommands extends PathCommands {
 
     public BasicCommands(Pathinator pathPlugin) {
-        this.plugin = pathPlugin;
-        this.config = pathPlugin.getPConfig();
+        super(pathPlugin);
     }
 
     /**
@@ -59,95 +53,73 @@ public class BasicCommands {
      * @param args
      */
 
-    public void basicPath(CommandSender sender, CommandArguments args) {
+    @Override
+    public void createPath(CommandSender sender, CommandArguments args) {
         Player player = (Player) sender;
+
+        // init some helpers
         PlayerHelper playerHelper = new PlayerHelper(player, plugin);
-
-        // Check if the player is in the correct game mode
-        if (playerHelper.isInAdventure() || playerHelper.isInSpectator()) {
-            playerHelper.msg("Pathinator does not work in " + playerHelper.getGameMode() + " mode.");
-            return;
-        }
-        // Check if we're enabled in survival mode
-        if (playerHelper.isInSurvival() && !config.getEnabledInSurvival()) {
-            playerHelper.msg("Pathinator is disabled in survival mode.");
-            return;
-        }
-
         BlockHelper blockHelper = new BlockHelper(plugin);
 
-        // Find the block under the player
-        Block block = blockHelper.getBlockUnderPlayer(player);
-        int inventoryCount = playerHelper.getItemCount(block);
-        Material blockMaterial = block.getBlockData().getMaterial();
-        if (blockMaterial == Material.AIR && playerHelper.isInSurvival()) {
-            playerHelper.msg("Standing on AIR. Please stand on a solid block to place a path.");
+        // Check if the player is in a supported game mode
+        if (!modeCheck(playerHelper)) {
             return;
         }
 
-        Location blockLocation = block.getLocation();
+        // Get the block under the player
+        Block targetBlock = findTargetBlock(blockHelper, playerHelper);
+        if (targetBlock == null) {
+            return;
+        }
 
         BlockFace facing = player.getFacing();
 
-        Integer blockCount = (Integer) args.getOrDefault(PathCommands.DISTANCE, 0);
+        int inventoryCount = playerHelper.getItemCount(targetBlock);
+        Integer blockCount = getDistance(args);
         if (blockCount <= 0) {
             return;
         }
+
+        // copy the original count
         int requestedCount = blockCount;
 
         // Don't allow more blocks to be placed than are in the player's inventory
         if (playerHelper.isInSurvival() && blockCount > inventoryCount) {
-            blockCount = inventoryCount;
+            blockCount = inventoryCount; // update count
         }
 
-        Boolean setLights = args.getByClass(PathCommands.WITH_LIGHTS, Boolean.class);
-        setLights = setLights != null ? setLights : false;
+        final ArrayList<ItemStack> lightingStack = getLightingStack(args, playerHelper);
 
-        ArrayList<ItemStack> lightingStacks = new ArrayList<ItemStack>();
-        if (setLights) {
-            int clearance = config.getClearance();
-            List<String> configuredStack = config.getLightingStack();
-            for (int i = 0; i < configuredStack.size(); i++) {
-                // Don't allow the lighting stack to exceed the clearance height in survival
-                if (playerHelper.isInSurvival()) {
-                    --clearance;
-                }
-                if (clearance >= 0) {
-                    lightingStacks.add(new ItemStack(Material.getMaterial(configuredStack.get(i))));
-                }
-            }
-        }
-
-        int lightingInterval = config.getLightingInterval();
-
-        Location placedLocation = blockLocation.clone();
+        Location placedLocation = targetBlock.getLocation().clone();
 
         for (int i = 0; i < blockCount; i++) {
             blockHelper.adjustLocationForward(placedLocation, facing);
 
             SegmentData segmentData = new SegmentData();
-            segmentData.setBaseFacing(facing);
-            segmentData.setBaseMaterial(blockMaterial);
             segmentData.setWorld(player.getWorld());
+            segmentData.setBaseFacing(facing);
+            segmentData.setBaseMaterial(targetBlock.getBlockData().getMaterial());
+            segmentData.setBaseLocation(placedLocation);
             segmentData.setClearance(config.getClearance());
             segmentData.setClearanceMaterial(Material.getMaterial(config.getClearanceMaterial()));
-            segmentData.addLightingStacks(lightingStacks);
-            segmentData.setBaseLocation(placedLocation);
 
-            if (setLights && i != 0 && i % lightingInterval == 0) {
+            if (getWithLights(args) && i != 0 && (i % config.getLightingInterval()) == 0) {
+                segmentData.addLightingStacks(lightingStack);
                 segmentData.addLighting();
             }
 
             // This is where the magic happens
             blockHelper.placeBlock(segmentData, i, playerHelper);
         }
+
         if (requestedCount != blockCount) {
             playerHelper.msg(
-                    "Requested " + requestedCount + " blocks of " + block.getType().name() + ", but only able to place "
+                    "Requested " + requestedCount + " blocks of " + targetBlock.getType().name()
+                            + ", but only able to place "
                             + blockCount + ".");
         } else {
             String prefix = playerHelper.isInSurvival() ? "Attempting to place " : "Placed ";
-            playerHelper.msg(prefix + blockCount + " blocks of " + block.getType().name() + ".");
+            playerHelper.msg(prefix + blockCount + " blocks of " + targetBlock.getType().name() + ".");
         }
     }
 

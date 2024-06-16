@@ -53,6 +53,15 @@ public class PlayerHelper {
     }
 
     /**
+     * Get the player
+     * 
+     * @return
+     */
+    public Player getPlayer() {
+        return player;
+    }
+
+    /**
      * Get the player's game mode
      * 
      * @return
