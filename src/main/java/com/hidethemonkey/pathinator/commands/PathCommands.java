@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 
@@ -48,6 +49,10 @@ public abstract class PathCommands {
 
     // parameters
     public static final String DISTANCE = "distance";
+    public static final String WIDTH = "width";
+    public static final String HEIGHT = "height";
+    public static final String PATH_MATERIAL = "path material";
+    public static final String CLEARANCE_MATERIAL = "clearance material";
     public static final String WITH_LIGHTS = "with lights";
     public static final String WITH_POWER = "with power";
 
@@ -75,6 +80,53 @@ public abstract class PathCommands {
     }
 
     /**
+     * Gets the width argument from the command arguments.
+     *
+     * @param args The command arguments.
+     * @return The width argument, or 1 if not provided.
+     */
+    protected Integer getWidth(CommandArguments args) {
+        return (Integer) args.getOrDefault(WIDTH, 1);
+    }
+
+    /**
+     * Gets the height argument from the command arguments.
+     *
+     * @param args          The command arguments.
+     * @param defaultHeight The default height.
+     * @return The height argument, or the default height if not provided.
+     */
+    protected Integer getHeight(CommandArguments args, int defaultHeight) {
+        return (Integer) args.getOrDefault(HEIGHT, defaultHeight);
+    }
+
+    /**
+     * Gets the path material from the command arguments.
+     *
+     * @param args       The command arguments.
+     * @param targetData The target block data.
+     * @return The path material.
+     */
+    protected Material getPathMaterial(CommandArguments args, BlockData targetData) {
+        return ((BlockData) args.getOrDefault(PATH_MATERIAL, targetData)).getMaterial();
+    }
+
+    /**
+     * Gets the clearance material from the command arguments.
+     *
+     * @param args           The command arguments.
+     * @param configMaterial The config material.
+     * @return The clearance material.
+     */
+    protected Material getClearanceMaterial(CommandArguments args, String configMaterial) {
+        BlockData clearanceData = (BlockData) args.get(CLEARANCE_MATERIAL);
+        if (clearanceData != null) {
+            return clearanceData.getMaterial();
+        }
+        return Material.getMaterial(configMaterial);
+    }
+
+    /**
      * Gets the withLights argument from the command arguments.
      *
      * @param args The command arguments.
@@ -95,7 +147,7 @@ public abstract class PathCommands {
     }
 
     /**
-     * Checks if the player is in the correct game mode.
+     * Checks if the player is in a supported game mode.
      *
      * @param playerHelper The player helper instance.
      * @return True if the player is in the correct game mode, false otherwise.
@@ -124,7 +176,7 @@ public abstract class PathCommands {
     protected Block findTargetBlock(BlockHelper blockHelper, PlayerHelper playerHelper) {
         Block block = blockHelper.getBlockUnderPlayer(playerHelper.getPlayer());
         Material blockMaterial = block.getBlockData().getMaterial();
-        if (blockMaterial == Material.AIR && playerHelper.isInSurvival()) {
+        if (blockMaterial.isAir() && playerHelper.isInSurvival()) {
             playerHelper.msg("Found a block of AIR. Please stand on a solid block to place a path.");
             return null;
         }

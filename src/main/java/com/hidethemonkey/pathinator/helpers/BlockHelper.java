@@ -24,6 +24,8 @@
 
 package com.hidethemonkey.pathinator.helpers;
 
+import java.util.ArrayList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -63,6 +65,20 @@ public class BlockHelper {
             return min.getBlock();
         }
         return min.getBlock();
+    }
+
+    /**
+     * Get the space occupied by the player
+     * 
+     * @param player
+     * @return
+     */
+    public BoundingBox getPlayerSpace(Block targetBlock) {
+        Location loc = targetBlock.getLocation();
+        double x = loc.getX();
+        double y = loc.getY();
+        double z = loc.getZ();
+        return new BoundingBox(x, y, z, x + 1, y + 3, z + 1);
     }
 
     /**
@@ -106,23 +122,45 @@ public class BlockHelper {
      */
     public void placeBlock(final SegmentData data, final int delay, final PlayerHelper playerHelper) {
         Location location = data.getBaseLocation();
-        int x = location.getBlockX();
-        int y = location.getBlockY();
-        int z = location.getBlockZ();
-        Block baseBlock = data.getWorld().getBlockAt(x, y, z);
 
         // Schedule the block placement
         Bukkit.getScheduler().runTaskLater(this.plugin, task -> {
+            int x = location.getBlockX();
+            int y = location.getBlockY();
+            int z = location.getBlockZ();
+            Block targetBlock = data.getWorld().getBlockAt(x, y, z);
 
             // Place the base block
-            mineAndReplace(data.getBaseMaterial(), baseBlock, playerHelper);
+            Material baseMaterial = data.getBaseMaterial();
+            if (data.getCurrentSection() == SegmentData.Section.CENTER) {
+                mineAndReplace(baseMaterial, targetBlock, playerHelper);
+            } else {
+                ArrayList<Material> sideMaterials = data.getCurrentSection() == SegmentData.Section.RIGHT
+                        ? data.getRightMaterials()
+                        : data.getLeftMaterials();
+                Material sideMaterial;
+                try {
+                    sideMaterial = sideMaterials.get(data.getSideIndex());
+                } catch (IndexOutOfBoundsException e) {
+                    sideMaterial = data.getBaseMaterial();
+                }
+                mineAndReplace(sideMaterial, targetBlock, playerHelper);
+            }
 
             // Clear the air...
             int clearance = data.getClearance();
             for (int i = 1; i <= clearance; i++) {
                 Block airBlock = data.getWorld().getBlockAt(x, y + i, z);
-                if (!mineAndReplace(data.getClearanceMaterial(), airBlock, playerHelper)) {
-                    continue;
+                if (data.getCurrentSection() == SegmentData.Section.CENTER && delay < 4) {
+                    if (!data.getNegativeSpace().contains(airBlock.getLocation().toVector())) {
+                        if (!mineAndReplace(data.getClearanceMaterial(), airBlock, playerHelper)) {
+                            continue;
+                        }
+                    }
+                } else {
+                    if (!mineAndReplace(data.getClearanceMaterial(), airBlock, playerHelper)) {
+                        continue;
+                    }
                 }
             }
 
@@ -152,6 +190,9 @@ public class BlockHelper {
         // Add Rails
         if (data.getUseRails()) {
             Bukkit.getScheduler().runTaskLater(this.plugin, task -> {
+                int x = location.getBlockX();
+                int y = location.getBlockY();
+                int z = location.getBlockZ();
                 // railBlock is the block above the just placed base block
                 // and as such should always be AIR
                 Block railBlock = data.getWorld().getBlockAt(x, y + 1, z);
@@ -177,6 +218,15 @@ public class BlockHelper {
         }
     }
 
+    public ArrayList<Material> getSideMaterials(Block block, BlockFace facing, int blocks) {
+        ArrayList<Material> materials = new ArrayList<Material>();
+        for (int i = 1; i <= blocks; i++) {
+            Block sideBlock = block.getRelative(facing, i);
+            materials.add(sideBlock.getType());
+        }
+        return materials;
+    }
+
     /**
      * Increment/Decrement the location based on the facing direction
      * 
@@ -188,23 +238,25 @@ public class BlockHelper {
      * @param location
      * @param facing
      */
-    public void adjustLocationForward(Location location, BlockFace facing) {
+    public Location adjustLocationForward(Location location, BlockFace facing) {
+        Location tmpLocation = location.clone();
         switch (facing) {
             case WEST:
-                location.setX(location.getX() - 1);
+                tmpLocation.setX(location.getX() - 1);
                 break;
             case EAST:
-                location.setX(location.getX() + 1);
+                tmpLocation.setX(location.getX() + 1);
                 break;
             case NORTH:
-                location.setZ(location.getZ() - 1);
+                tmpLocation.setZ(location.getZ() - 1);
                 break;
             case SOUTH:
-                location.setZ(location.getZ() + 1);
+                tmpLocation.setZ(location.getZ() + 1);
                 break;
             default:
                 break;
         }
+        return tmpLocation;
     }
 
     /**

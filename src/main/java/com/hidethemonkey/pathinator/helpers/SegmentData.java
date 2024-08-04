@@ -31,6 +31,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BoundingBox;
 
 public class SegmentData {
     private Material baseMaterial;
@@ -39,7 +40,14 @@ public class SegmentData {
     private World world;
     private int clearance;
     private BlockFace baseFacing;
-    // Lighing
+    private ArrayList<Material> rightMaterials;
+    private ArrayList<Material> leftMaterials;
+    private Section currentSection;
+    private int sideIndex;
+    // BoundingBox that represents where no blocks should be placed
+    private BoundingBox negativeSpace;
+    private BoundingBox emptyBox = new BoundingBox(0, 0, 0, 0, 0, 0);
+    // Lighting
     private BlockFace lightFacing;
     private Location lightingLocation;
     private ArrayList<ItemStack> lightingItems;
@@ -51,12 +59,39 @@ public class SegmentData {
     // Rails
     private boolean useRails = false;
 
+    public enum Section {
+        CENTER, LEFT, RIGHT
+    }
+
     /**
      * Default constructor for SegmentData.
      * Sets the clearanceMaterial to AIR.
      */
     public SegmentData() {
         clearanceMaterial = Material.AIR; // default to AIR
+        currentSection = Section.CENTER;
+    }
+
+    public SegmentData(SegmentData data) {
+        this.baseFacing = data.getBaseFacing();
+        this.baseLocation = data.getBaseLocation();
+        this.baseMaterial = data.getBaseMaterial();
+        this.clearance = data.getClearance();
+        this.clearanceMaterial = data.getClearanceMaterial();
+        this.currentSection = data.getCurrentSection();
+        this.leftMaterials = data.getLeftMaterials();
+        this.lightFacing = data.getLightFacing();
+        this.lightingItems = data.getLightingStacks();
+        this.lightingLocation = data.getLightingLocation();
+        this.negativeSpace = data.getNegativeSpace();
+        this.powerFacing = data.getPowerFacing();
+        this.powerLocation = data.getPowerLocation();
+        this.rightMaterials = data.getRightMaterials();
+        this.sideIndex = data.getSideIndex();
+        this.useLighting = data.getUseLighting();
+        this.usePower = data.getUsePower();
+        this.useRails = data.getUseRails();
+        this.world = data.getWorld();
     }
 
     /**
@@ -204,6 +239,100 @@ public class SegmentData {
      */
     public BlockFace getLightFacing() {
         return lightFacing;
+    }
+
+    /**
+     * Sets the right side materials of the segment.
+     *
+     * @param rightMaterials the new right materials
+     */
+    public void setRightMaterials(ArrayList<Material> rightMaterials) {
+        this.rightMaterials = rightMaterials;
+    }
+
+    /**
+     * Gets the right side materials of the segment.
+     *
+     * @return the right materials
+     */
+    public ArrayList<Material> getRightMaterials() {
+        return rightMaterials;
+    }
+
+    /**
+     * Sets the left side materials of the segment.
+     *
+     * @param leftMaterials the new left materials
+     */
+    public void setLeftMaterials(ArrayList<Material> leftMaterials) {
+        this.leftMaterials = leftMaterials;
+    }
+
+    /**
+     * Gets the left side materials of the segment.
+     *
+     * @return the left materials
+     */
+    public ArrayList<Material> getLeftMaterials() {
+        return leftMaterials;
+    }
+
+    /**
+     * Sets the current section of the segment.
+     *
+     * @param section the new current section
+     */
+    public void setCurrentSection(Section section) {
+        currentSection = section;
+    }
+
+    /**
+     * Gets the current section of the segment.
+     *
+     * @return the current section
+     */
+    public Section getCurrentSection() {
+        return currentSection;
+    }
+
+    /**
+     * Sets the side index of the segment.
+     *
+     * @param index the new side index
+     */
+    public void setSideIndex(int index) {
+        sideIndex = index;
+    }
+
+    /**
+     * Gets the side index of the segment.
+     *
+     * @return the side index
+     */
+    public int getSideIndex() {
+        return sideIndex;
+    }
+
+    /**
+     * Sets the negative space of the segment.
+     * i.e. the area where no blocks should be placed
+     *
+     * @param box the new negative space
+     */
+    public void setNegativeSpace(BoundingBox box) {
+        negativeSpace = box;
+    }
+
+    /**
+     * Gets the negative space of the segment.
+     *
+     * @return the negative space
+     */
+    public BoundingBox getNegativeSpace() {
+        if (negativeSpace == null) {
+            return emptyBox;
+        }
+        return negativeSpace;
     }
 
     /**

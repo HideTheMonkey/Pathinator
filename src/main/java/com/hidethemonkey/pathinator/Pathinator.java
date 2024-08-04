@@ -27,6 +27,7 @@ package com.hidethemonkey.pathinator;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.BlockStateArgument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 
@@ -108,7 +109,16 @@ public class Pathinator extends JavaPlugin {
                 .register();
 
         // Create custom path command
-        // CustomCommands custom = new CustomCommands(this, config);
+        CustomCommands custom = new CustomCommands(this);
+        new CommandAPICommand(PathCommands.CUSTOM)
+                .withAliases("pc")
+                .withArguments(new IntegerArgument(PathCommands.DISTANCE))
+                .withArguments(new IntegerArgument(PathCommands.WIDTH))
+                .withArguments(new IntegerArgument(PathCommands.HEIGHT))
+                .withOptionalArguments(new BlockStateArgument(PathCommands.PATH_MATERIAL))
+                .withOptionalArguments(new BlockStateArgument(PathCommands.CLEARANCE_MATERIAL))
+                .executesPlayer(custom::createPath)
+                .register();
     }
 
     /**

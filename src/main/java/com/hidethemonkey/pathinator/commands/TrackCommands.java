@@ -92,7 +92,7 @@ public class TrackCommands extends PathCommands {
         Location placedLocation = targetBlock.getLocation().clone();
 
         for (int i = 0; i < blockCount; i++) {
-            blockHelper.adjustLocationForward(placedLocation, facing);
+            placedLocation = blockHelper.adjustLocationForward(placedLocation, facing);
 
             SegmentData segmentData = new SegmentData();
             segmentData.setWorld(player.getWorld());
