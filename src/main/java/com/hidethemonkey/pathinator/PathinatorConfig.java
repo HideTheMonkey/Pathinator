@@ -44,7 +44,6 @@ public class PathinatorConfig {
 
     /**
      * @param fileConf
-     * @param log
      */
     public PathinatorConfig(FileConfiguration fileConf) {
         this.config = fileConf;
