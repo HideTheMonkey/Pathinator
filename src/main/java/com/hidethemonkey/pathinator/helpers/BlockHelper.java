@@ -64,7 +64,7 @@ public class BlockHelper {
             min = min.add(bf.getModX(), bf.getModY() - .02, bf.getModZ());
             return min.getBlock();
         }
-        return min.getBlock();
+        return minBlock;
     }
 
     /**
