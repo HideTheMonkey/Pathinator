@@ -27,9 +27,12 @@ package com.hidethemonkey.pathinator;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandTree;
 import dev.jorel.commandapi.arguments.BlockStateArgument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.executors.PlayerCommandExecutor;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
@@ -39,21 +42,27 @@ import org.bstats.charts.SimplePie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.hidethemonkey.pathinator.commands.PathCommands;
 import com.hidethemonkey.pathinator.commands.BasicCommands;
 import com.hidethemonkey.pathinator.commands.CustomCommands;
+import com.hidethemonkey.pathinator.commands.FollowCommands;
+import com.hidethemonkey.pathinator.commands.PathCommands;
 import com.hidethemonkey.pathinator.commands.TrackCommands;
-import com.hidethemonkey.pathinator.helpers.StringUtils;
+import com.hidethemonkey.pathinator.helpers.ConsoleHelper;
+import com.hidethemonkey.pathinator.helpers.FollowRegistry;
+import com.hidethemonkey.pathinator.helpers.StringHelper;
 import com.hidethemonkey.pathinator.helpers.VersionChecker;
 import com.hidethemonkey.pathinator.helpers.VersionData;
+import com.hidethemonkey.pathinator.listeners.PlayerMoveListener;
 
 public class Pathinator extends JavaPlugin {
 
     private PathinatorConfig pConfig;
     private Metrics metrics;
     private VersionData versionData;
+    private final FollowRegistry followRegistry = new FollowRegistry();
 
     /**
      * 
@@ -84,8 +93,9 @@ public class Pathinator extends JavaPlugin {
         // Initialize bStats metrics
         setupMetrics(pConfig);
 
-        // Register Player Join Listener
+        // Register Player Join and Quit Listeners
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
 
         CommandAPI.onEnable();
 
@@ -95,7 +105,7 @@ public class Pathinator extends JavaPlugin {
                 .withAliases("pb")
                 .withArguments(new IntegerArgument(PathCommands.DISTANCE))
                 .withOptionalArguments(new BooleanArgument(PathCommands.WITH_LIGHTS))
-                .executesPlayer(basic::createPath)
+                .executesPlayer((PlayerCommandExecutor) basic::createPath)
                 .register();
 
         // Create track path command
@@ -105,7 +115,7 @@ public class Pathinator extends JavaPlugin {
                 .withArguments(new IntegerArgument(PathCommands.DISTANCE))
                 .withOptionalArguments(new BooleanArgument(PathCommands.WITH_POWER))
                 .withOptionalArguments(new BooleanArgument(PathCommands.WITH_LIGHTS))
-                .executesPlayer(track::createPath)
+                .executesPlayer((PlayerCommandExecutor) track::createPath)
                 .register();
 
         // Create custom path command
@@ -117,8 +127,34 @@ public class Pathinator extends JavaPlugin {
                 .withArguments(new IntegerArgument(PathCommands.HEIGHT))
                 .withOptionalArguments(new BlockStateArgument(PathCommands.PATH_MATERIAL))
                 .withOptionalArguments(new BlockStateArgument(PathCommands.CLEARANCE_MATERIAL))
-                .executesPlayer(custom::createPath)
+                .executesPlayer((PlayerCommandExecutor) custom::createPath)
                 .register();
+
+        // Register Player Move Listener only if enbabled
+        if (pConfig.getFollowEnabled()) {
+            getServer().getPluginManager().registerEvents(new PlayerMoveListener(this, followRegistry), this);
+            FollowCommands follow = new FollowCommands(this, followRegistry);
+            new CommandTree(PathCommands.FOLLOW).withAliases("pf")
+                    .then(new LiteralArgument(
+                            PathCommands.START)
+                            .then(new IntegerArgument(
+                                    PathCommands.RADIUS,
+                                    PathinatorConfig.MIN_RADIUS, PathinatorConfig.MAX_RADIUS)
+                                    .then(new BlockStateArgument(PathCommands.PATH_MATERIAL)
+                                            .executesPlayer((PlayerCommandExecutor) follow::createPath))))
+                    .then(new LiteralArgument(
+                            PathCommands.START)
+                            .then(new IntegerArgument(PathCommands.RADIUS, PathinatorConfig.MIN_RADIUS,
+                                    PathinatorConfig.MAX_RADIUS)
+                                    .executesPlayer((PlayerCommandExecutor) follow::createPath)))
+                    .then(new LiteralArgument(
+                            PathCommands.START)
+                            .executesPlayer((PlayerCommandExecutor) follow::createPath))
+                    .then(new LiteralArgument(
+                            PathCommands.STOP)
+                            .executesPlayer((PlayerCommandExecutor) follow::stopFollowing))
+                    .register();
+        }
     }
 
     /**
@@ -188,6 +224,12 @@ public class Pathinator extends JavaPlugin {
 
                 metrics.addCustomChart(new SimplePie("config_powered_interval",
                         () -> Integer.toString(pConfig.getPoweredInterval())));
+
+                metrics.addCustomChart(new SimplePie("config_follow_enabled",
+                        () -> pConfig.getFollowEnabled() ? "true" : "false"));
+
+                metrics.addCustomChart(new SimplePie("config_follow_radius",
+                        () -> Integer.toString(pConfig.getRadius())));
             } else {
                 getLogger().warning(
                         "bStats is not enabled! Please consider activating this service to help me keep track of Pathinator usage. 🙇");
@@ -207,15 +249,7 @@ public class Pathinator extends JavaPlugin {
         DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(versionData.getVersion());
         DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(getDescription().getVersion());
         if (latestVersion.compareTo(currentVersion) > 0) {
-            getLogger().warning("**************************************************************");
-            getLogger().warning("* A new version of Pathinator is available!");
-            getLogger().warning("*");
-            getLogger().warning("* New version: " + versionData.getVersion());
-            getLogger().warning("* Your version: " + getDescription().getVersion());
-            getLogger().warning("*");
-            getLogger().warning("* Please update to take advantage of the latest features and bug fixes.");
-            getLogger().warning("* Download here: https://hangar.papermc.io/HideTheMonkey/Pathinator");
-            getLogger().warning("**************************************************************");
+            ConsoleHelper.sendNewVersionNotice(versionData.getVersion(), getDescription().getVersion());
         }
     }
 
@@ -224,7 +258,15 @@ public class Pathinator extends JavaPlugin {
         public void onPlayerJoin(PlayerJoinEvent event) {
             getMetrics().addCustomChart(
                     new SimplePie("player_locale",
-                            () -> String.valueOf(StringUtils.formatLocale(event.getPlayer().getLocale()))));
+                            () -> String.valueOf(StringHelper.formatLocale(event.getPlayer().getLocale()))));
+        }
+    }
+
+    public class PlayerQuitListener implements Listener {
+        @EventHandler
+        public void onPlayerQuit(PlayerQuitEvent event) {
+            // Clean up when players leave
+            followRegistry.remove(event.getPlayer());
         }
     }
 }

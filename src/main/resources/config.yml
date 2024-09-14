@@ -13,7 +13,7 @@ clearance:
   # Default number of blocks that will be replaced with AIR above the path
   height: 3
 
-  # If you want to use a different material for the air block, you can do so here
+  # If you want to set a default material for the air block, you can do so here
   material: AIR
 
 lighting:
@@ -27,7 +27,7 @@ lighting:
   #
   # Examples:
   # stack: [DARK_OAK_FENCE, LANTERN]
-  # stack: [GLOWSTONE]
+  # stack: [SEA_LANTERN]
   stack: [TORCH]
 
 survival:
@@ -55,3 +55,13 @@ tracks:
   # The interval between each powered rail. e.g. a value of 34 will place a powered rail every 34 blocks,
   # with 33 blocks of regular rail in between.
   powerInterval: 34
+
+follow:
+  # If true, adds a PlayerMoveEvent listenter to Pathinator, and associated command to create a path wherever the player goes.
+  # NOTE that this may cause performance issues on servers with a large number of players, due to the number of events being fired.
+  enabled: true
+
+  # The default radius for the follow command. This is the number of blocks around the player that will be set as the path (0-5).
+  # With a radius of 0, the path will be a single block behind the player. 1 will create a path 3 blocks wide, and 5 is useful when
+  # you want to cover a large area quickly.
+  radius: 0

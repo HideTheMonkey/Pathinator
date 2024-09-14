@@ -41,6 +41,8 @@ public class PathinatorConfig {
     private String pluginName = "";
 
     public static final String ENABLE_STATS = "enableStats";
+    public static final int MIN_RADIUS = 0;
+    public static final int MAX_RADIUS = 5;
 
     /**
      * @param fileConf
@@ -155,6 +157,41 @@ public class PathinatorConfig {
      */
     public boolean getRequireTool() {
         return config.getBoolean("survival.requireTool");
+    }
+
+    /**
+     * Ensures config radius is within our valid range.
+     *
+     * @return the normalized radius
+     */
+    public int ensureRadius(int radius) {
+        if (radius > MAX_RADIUS) {
+            radius = MAX_RADIUS;
+        } else if (radius < MIN_RADIUS) {
+            radius = MIN_RADIUS;
+        }
+        return radius;
+    }
+
+    /**
+     * Gets the follow radius configuration value.
+     *
+     * @return the follow radius
+     */
+    public int getRadius() {
+        return config.getInt("follow.radius");
+    }
+
+    /**
+     * Gets whether the follow command is enabled.
+     * 
+     * NOTE: enabling this will add a PlayerMoveEvent listener to the plugin, 
+     *       which may cause performance issues on servers with a large number of players.
+     *
+     * @return true if the follow command is enabled, false otherwise
+     */
+    public boolean getFollowEnabled() {
+        return config.getBoolean("follow.enabled");
     }
 
     /**
