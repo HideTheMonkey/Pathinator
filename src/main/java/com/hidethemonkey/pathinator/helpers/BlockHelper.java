@@ -25,6 +25,7 @@
 package com.hidethemonkey.pathinator.helpers;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -47,6 +48,26 @@ public class BlockHelper {
     }
 
     /**
+     * Makes a decent effort to find the block under the player,
+     * while avoiding AIR blocks.
+     * 
+     * @param player
+     * @return
+     */
+    public Block findBlockUnderPlayer(Player player) {
+        Block minBlock = getBlockUnderPlayer(player);
+        // standing close to the edge?, try to find the block behind the player's
+        // current position.
+        if (minBlock.getType().isAir()) {
+            plugin.getLogger().info("Player is standing on air, trying to find block behind them...");
+            BlockFace bf = player.getFacing().getOppositeFace();
+            Location min = minBlock.getLocation().add(bf.getModX(), bf.getModY() - .02, bf.getModZ());
+            return min.getBlock();
+        }
+        return minBlock;
+    }
+
+    /**
      * Get the block under the player
      * 
      * @param player
@@ -55,16 +76,7 @@ public class BlockHelper {
     public Block getBlockUnderPlayer(Player player) {
         BoundingBox bb = player.getBoundingBox();
         Location min = new Location(player.getWorld(), bb.getMinX(), bb.getMinY() - .02, bb.getMinZ());
-        Block minBlock = min.getBlock();
-        // standing close to the edge?, try to find the block behind the player's
-        // current position.
-        if (minBlock.getType() == Material.AIR) {
-            plugin.getLogger().info("Player is standing on air, trying to find block behind them...");
-            BlockFace bf = player.getFacing().getOppositeFace();
-            min = min.add(bf.getModX(), bf.getModY() - .02, bf.getModZ());
-            return min.getBlock();
-        }
-        return minBlock;
+        return min.getBlock();
     }
 
     /**
@@ -218,6 +230,14 @@ public class BlockHelper {
         }
     }
 
+    /**
+     * Get the materials to either side of the target block
+     * 
+     * @param block
+     * @param facing
+     * @param blocks
+     * @return
+     */
     public ArrayList<Material> getSideMaterials(Block block, BlockFace facing, int blocks) {
         ArrayList<Material> materials = new ArrayList<Material>();
         for (int i = 1; i <= blocks; i++) {
@@ -298,5 +318,46 @@ public class BlockHelper {
         }
 
         return newFacing;
+    }
+
+    /**
+     * Get a list of blocks in the Y plane around a start block, given a specific radius
+     * Will not include blocks of the same material as the provided material
+     * 
+     * Inspired by https://www.spigotmc.org/threads/tutorial-getting-blocks-in-a-cube-radius.64981/#post-717133
+     * 
+     * @param start
+     * @param radius
+     * @param material
+     * @return
+     */
+    public List<Block> findBlocksInRadius(Block start, int radius, Material material) {
+        int iterations = (radius * 2) + 1;
+        List<Block> blocks = new ArrayList<Block>(iterations * iterations);
+        for (int x = -radius; x <= radius; x++) {
+            for (int z = -radius; z <= radius; z++) {
+                Block toAdd = start.getRelative(x, 0, z);
+                Material type = toAdd.getType();
+                if (!type.isSolid() || type.equals(material)) {
+                    continue;
+                }
+                blocks.add(toAdd);
+            }
+        }
+        return blocks;
+    }
+
+    /**
+     * Set blocks in a radius around a start block to a specific material
+     * 
+     * @param block
+     * @param radius
+     * @param material
+     */
+    public void setBlocksInRadius(Block block, int radius, Material material) {
+        List<Block> blocks = findBlocksInRadius(block, radius, material);
+        for (Block b : blocks) {
+            b.setType(material);
+        }
     }
 }

@@ -46,6 +46,7 @@ public abstract class PathCommands {
     public static final String BASIC = "path:basic";
     public static final String CUSTOM = "path:custom";
     public static final String TRACKS = "path:tracks";
+    public static final String FOLLOW = "path:follow";
 
     // parameters
     public static final String DISTANCE = "distance";
@@ -55,6 +56,9 @@ public abstract class PathCommands {
     public static final String CLEARANCE_MATERIAL = "clearance material";
     public static final String WITH_LIGHTS = "with lights";
     public static final String WITH_POWER = "with power";
+    public static final String RADIUS = "radius";
+    public static final String START = "start";
+    public static final String STOP = "stop";
 
     protected Pathinator plugin;
     protected PathinatorConfig config;
@@ -98,6 +102,16 @@ public abstract class PathCommands {
      */
     protected Integer getHeight(CommandArguments args, int defaultHeight) {
         return (Integer) args.getOrDefault(HEIGHT, defaultHeight);
+    }
+
+    /**
+     * Gets the radius argument from the command arguments.
+     *
+     * @param args The command arguments.
+     * @return The radius argument, or the default radius if not provided.
+     */
+    protected Integer getRadius(CommandArguments args) {
+        return config.ensureRadius((Integer) args.getOrDefault(RADIUS, config.getRadius()));
     }
 
     /**
@@ -174,7 +188,7 @@ public abstract class PathCommands {
      * @return The target block, or null if not found.
      */
     protected Block findTargetBlock(BlockHelper blockHelper, PlayerHelper playerHelper) {
-        Block block = blockHelper.getBlockUnderPlayer(playerHelper.getPlayer());
+        Block block = blockHelper.findBlockUnderPlayer(playerHelper.getPlayer());
         Material blockMaterial = block.getBlockData().getMaterial();
         if (blockMaterial.isAir() && playerHelper.isInSurvival()) {
             playerHelper.msg("Found a block of AIR. Please stand on a solid block to place a path.");
