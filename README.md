@@ -24,31 +24,40 @@ In Creative mode, you can place as many blocks of any type as you want, with no 
 
 #### Basic
 
-`path:basic <distance> [with lights]` (aliased as `pb`) where \<distance\> is the number of blocks to place, and [with lights] is an optional boolean `true|false` whether to place a light every N<sup>\*</sup> number of blocks.
+`path:basic <distance> [with lights]` (_aliased as `pb`_) where \<distance\> is the number of blocks to place, and [with lights] is an optional boolean `true|false` whether to place a light every N<sup>\*</sup> number of blocks.
 
 For example: `path:basic 25 true` to create a path 25 blocks long with lights, or `path:basic 25` where [with lights] defaults to false for no lights.
 
 #### Tracks
 
-`path:tracks <distance> [with power] [with lights]` (aliased as `pt`) where \<distance\> is the number of blocks to place, and [with power] is an optional boolean `true|false` whether to place a powered rail every N<sup>\*</sup> number of blocks. [with lights] is another optional boolean whether to place a light every N<sup>\*</sup> number of blocks.
+`path:tracks <distance> [with power] [with lights]` (_aliased as `pt`_) where \<distance\> is the number of blocks to place, and [with power] is an optional boolean `true|false` whether to place a powered rail every N<sup>\*</sup> number of blocks. [with lights] is another optional boolean whether to place a light every N<sup>\*</sup> number of blocks.
 
 <sup>\*</sup> _N is configurable in `/plugins/Pathinator/config.yml`_
 
 #### Custom
 
-`path:custom <distance> <width> <height> [path material] [clearance material]` (aliased as `pc`) where **\<distance\>** **\<width\>** and **\<height\>** are required and **[path material]** and **[clearance material]** are optional. If no **[path material]** is specified Pathinator will detect the pattern of blocks the player is currently standing on for the path. For example: if you create a path 3 blocks wide Pathinator will detect the block under the player and one block to the left and right and keep that same pattern for the entire distance requested.
+`path:custom <distance> <width> <height> [path material] [clearance material]` (_aliased as `pc`_) where **\<distance\>** **\<width\>** and **\<height\>** are required and **[path material]** and **[clearance material]** are optional. If no **[path material]** is specified Pathinator will detect the pattern of blocks the player is currently standing on for the path. For example: if you create a path 3 blocks wide Pathinator will detect the block under the player and one block to the left and right and keep that same pattern for the entire distance requested.
 
 Additionally, you can specify what material to use to fill the 'air' space above the path (clearance material). This allows you to easily create 3 dimensional structures out of any material!
 
 #### Follow
 
-`path:follow <start|stop> [radius] [path material]` (aliased as `pf`) where **[radius]** is a number between 0 and 5, and **[path material]** is any solid block. **NOTE you must run `path:follow stop` to tell Pathinator to stop creating a path wherever you walk.**
+`path:follow <start|stop> [radius] [path material]` (_aliased as `pf`_) where **[radius]** is a number between 0 and 5, and **[path material]** is any solid block. **NOTE you must run `path:follow stop` to tell Pathinator to stop creating a path wherever you walk.**
 
 For example, `path:follow start` will start following using the default radius and whatever block you are currently standing on. `path:follow start 2 minecraft:oak_planks` will create a wide path with OAK_PLANKS.
 
 The follow command only works in Creative mode at this time.
 
-## Examples
+#### Dig
+
+`path:dig <up|down|ahead|vup|vdown> [distance]` (_aliased as `pd`_) where \<distance\> is the number of blocks away from you to dig. `path:dig` does not place any blocks, it only removes them (_and adds to your inventory when in survival_).
+`up|down` will dig a stair step pattern either up or down with the default clearance height (set in config.yml).
+`vup|vdown` (vertical up | vertical down) will dig straight up or down starting from one block in front of where the player is standing.
+
+For example, `path:dig down 20` will dig a stair step pattern extending 20 blocks, starting from the block in front of the player. (1 block forward, and 1 block down)
+`path:dig vup 20` will dig straight up for 20 blocks starting from the block in front of the player.
+
+## GIF Examples
 
 <details> 
   <summary>/path:basic</summary>

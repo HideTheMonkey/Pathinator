@@ -32,6 +32,7 @@ import dev.jorel.commandapi.arguments.BlockStateArgument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.executors.PlayerCommandExecutor;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -47,6 +48,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.hidethemonkey.pathinator.commands.BasicCommands;
 import com.hidethemonkey.pathinator.commands.CustomCommands;
+import com.hidethemonkey.pathinator.commands.DigCommands;
 import com.hidethemonkey.pathinator.commands.FollowCommands;
 import com.hidethemonkey.pathinator.commands.PathCommands;
 import com.hidethemonkey.pathinator.commands.TrackCommands;
@@ -155,6 +157,30 @@ public class Pathinator extends JavaPlugin {
                             .executesPlayer((PlayerCommandExecutor) follow::stopFollowing))
                     .register();
         }
+
+        DigCommands dig = new DigCommands(this);
+        new CommandTree(PathCommands.DIG).withAliases("pd")
+                .then(new StringArgument(
+                        PathCommands.UP)
+                        .then(new IntegerArgument(PathCommands.DISTANCE)
+                                .executesPlayer((PlayerCommandExecutor) dig::createPath)))
+                .then(new StringArgument(
+                        PathCommands.DOWN)
+                        .then(new IntegerArgument(PathCommands.DISTANCE)
+                                .executesPlayer((PlayerCommandExecutor) dig::createPath)))
+                .then(new StringArgument(
+                        PathCommands.AHEAD)
+                        .then(new IntegerArgument(PathCommands.DISTANCE)
+                                .executesPlayer((PlayerCommandExecutor) dig::createPath)))
+                .then(new StringArgument(
+                        PathCommands.VUP)
+                        .then(new IntegerArgument(PathCommands.DISTANCE)
+                                .executesPlayer((PlayerCommandExecutor) dig::createPath)))
+                .then(new StringArgument(
+                        PathCommands.VDOWN)
+                        .then(new IntegerArgument(PathCommands.DISTANCE)
+                                .executesPlayer((PlayerCommandExecutor) dig::createPath)))
+                .register();
     }
 
     /**

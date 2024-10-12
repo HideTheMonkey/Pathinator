@@ -34,6 +34,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -41,6 +42,7 @@ import org.bukkit.inventory.PlayerInventory;
 import com.hidethemonkey.pathinator.Pathinator;
 
 import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class PlayerHelper {
 
@@ -194,21 +196,32 @@ public class PlayerHelper {
      * @param item
      * @param damage
      */
-    public void addToolDamage(ItemStack item, int damage) {
+    public void addToolDamage(ItemStack item) {
         if (item != null && item.getAmount() > 0 && plugin.getPConfig().getTakeToolDamage()) {
             String toolName = item.getType().name();
             if (!toolName.contains("AXE") && !toolName.contains("SHOVEL") && !toolName.contains("HOE")) {
                 return; // item is not a tool
             }
-            Damageable damageMeta = (Damageable) item.getItemMeta();
-            damageMeta.setDamage(damageMeta.getDamage() + damage);
-            item.setItemMeta(damageMeta);
+            int damage = 1;
+            ItemMeta meta = item.getItemMeta();
+            if (meta.hasEnchant(Enchantment.UNBREAKING)) {
+                int level = item.getEnchantmentLevel(Enchantment.UNBREAKING);
+                // calculate percent chance of not taking damage
+                if (Math.random() * 100 < 100 / (level + 1)) {
+                    damage = 0;
+                }
+            }
+            if (damage > 0) {
+                Damageable damageMeta = (Damageable) item.getItemMeta();
+                damageMeta.setDamage(damageMeta.getDamage() + damage);
+                item.setItemMeta(damageMeta);
 
-            if (item.getType().getMaxDurability() <= damageMeta.getDamage() + damage) {
-                if (player.getInventory().contains(item)) {
-                    player.getInventory().remove(item);
-                    player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 3.0F, 0.69F); // giggity giggity
-                    msg("Your " + toolName + " broke!");
+                if (item.getType().getMaxDurability() <= damageMeta.getDamage() + damage) {
+                    if (player.getInventory().contains(item)) {
+                        player.getInventory().remove(item);
+                        player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 3.0F, 0.69F); // giggity giggity
+                        msg("Your " + toolName + " broke!");
+                    }
                 }
             }
         }
@@ -247,9 +260,10 @@ public class PlayerHelper {
      * @param material
      * @return
      */
-    public boolean giveBlock(Material material) {
+    public boolean giveBlock(Material material, int amount) {
+
         if (plugin.getPConfig().getKeepMaterial()) {
-            HashMap<Integer, ItemStack> items = player.getInventory().addItem(new ItemStack(material, 1));
+            HashMap<Integer, ItemStack> items = player.getInventory().addItem(new ItemStack(material, amount));
             return items.isEmpty();
         }
         return true;

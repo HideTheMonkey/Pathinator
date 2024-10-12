@@ -47,6 +47,7 @@ public abstract class PathCommands {
     public static final String CUSTOM = "path:custom";
     public static final String TRACKS = "path:tracks";
     public static final String FOLLOW = "path:follow";
+    public static final String DIG = "path:dig";
 
     // parameters
     public static final String DISTANCE = "distance";
@@ -59,9 +60,35 @@ public abstract class PathCommands {
     public static final String RADIUS = "radius";
     public static final String START = "start";
     public static final String STOP = "stop";
+    public static final String UP = "up";
+    public static final String DOWN = "down";
+    public static final String AHEAD = "ahead";
+    public static final String VUP = "vup";
+    public static final String VDOWN = "vdown";
 
     protected Pathinator plugin;
     protected PathinatorConfig config;
+
+    enum DigDirection {
+        UP,
+        DOWN,
+        AHEAD,
+        VUP,
+        VDOWN;
+    }
+
+    public Enum<?> getDigDirection(CommandArguments args) {
+        Object upDownDir = args.get(0);
+
+        if (upDownDir != null) {
+            try {
+                return DigDirection.valueOf(upDownDir.toString().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Do nothing
+            }
+        }
+        return DigDirection.AHEAD;
+    }
 
     /**
      * Constructor for PathCommands.
