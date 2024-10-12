@@ -32,8 +32,10 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 
@@ -42,9 +44,13 @@ import com.hidethemonkey.pathinator.Pathinator;
 public class BlockHelper {
 
     Plugin plugin;
+    int[][] fortunes = new int[3][4];
 
     public BlockHelper(Pathinator pathPlugin) {
         this.plugin = pathPlugin;
+        fortunes[0] = new int[] { 66, 33, 0, 0 };
+        fortunes[1] = new int[] { 50, 25, 25, 0 };
+        fortunes[2] = new int[] { 40, 20, 20, 20 };
     }
 
     /**
@@ -94,6 +100,45 @@ public class BlockHelper {
     }
 
     /**
+     * Calculate the amount of drops per the fortune level
+     * 
+     * @param level
+     * @return
+     */
+    public int getFortuneDrops(int level) {
+        int numberOfDrops = 1;
+
+        // Ensure fortune level is within a valid range:
+        // (We only support natural levels 1-3)
+        if (level < 1) {
+            level = 1;
+        } else if (level > 3) {
+            level = 3;
+        }
+
+        // adjust for array indexing
+        level--;
+
+        int baseChance = fortunes[level][0];
+        int firstChance = fortunes[level][1];
+        int secondChance = fortunes[level][2];
+        int thirdChance = fortunes[level][3];
+
+        int chance = (int) (Math.random() * 100);
+        if (chance < baseChance) {
+            numberOfDrops = 1;
+        } else if (chance > baseChance && chance < (baseChance + firstChance)) {
+            numberOfDrops = 2;
+        } else if (chance > (baseChance + firstChance) && chance < (baseChance + firstChance + secondChance)) {
+            numberOfDrops = 3;
+        } else if (chance > (baseChance + firstChance + secondChance) && chance < (baseChance + firstChance
+                + secondChance + thirdChance)) {
+            numberOfDrops = 4;
+        }
+        return numberOfDrops;
+    }
+
+    /**
      * Mine and replace a block
      * 
      * @param toPlace
@@ -103,24 +148,48 @@ public class BlockHelper {
      */
     private boolean mineAndReplace(Material toPlace, Block block, PlayerHelper ph) {
         Material toRemove = block.getType();
-        if (toRemove != toPlace && ph.hasBlock(toPlace)) {
+        if (toPlace == null || toRemove != toPlace && ph.hasBlock(toPlace)) {
             if (ph.isInSurvival()) {
+                ItemStack tool = ph.getMineableTool(toRemove);
                 // ** Handle tool damage **
                 if (!toRemove.isAir() && toRemove != Material.WATER && toRemove.getHardness() >= 0.5) {
-                    ItemStack tool = ph.getMineableTool(toRemove);
                     if (tool != null && tool.getAmount() == 0 && ph.requiresTools()) {
                         // Don't allow the block to be placed if the player doesn't have the right tool
                         return false;
                     }
                     // Apply damage to the appropriate tool in inventory
-                    ph.addToolDamage(tool, 1);
+                    ph.addToolDamage(tool);
                 }
-                // ** Always remove from inventory **
-                ph.removeBlock(toPlace);
-                // ** Add the mined material to the inventory **
-                ph.giveBlock(toRemove);
+                if (toPlace != null) {
+                    // ** remove from inventory **
+                    ph.removeBlock(toPlace);
+                }
+                if (tool != null) {
+                    ItemMeta meta = tool.getItemMeta();
+                    // handle SILK_TOUCH
+                    if (meta.hasEnchant(Enchantment.SILK_TOUCH)) {
+                        // Don't try to figure out all the conditions,
+                        // just give the player the block already, geeze.
+                        ph.giveBlock(toRemove, 1);
+                    }
+                    // handle FORTUNE
+                    else if (meta.hasEnchant(Enchantment.FORTUNE)) {
+                        int fortuneDropCount = getFortuneDrops(tool.getEnchantmentLevel(Enchantment.FORTUNE));
+
+                        // ** Add the mined material to the inventory **
+                        block.getDrops(tool).forEach(drop -> {
+                            int drops = drop.getAmount() <= fortuneDropCount ? fortuneDropCount : drop.getAmount();
+                            ph.giveBlock(drop.getType(), drops);
+                        });
+                    }
+                    // default no enchantments
+                    else {
+                        // ** Add the mined material to the inventory **
+                        block.getDrops(tool).forEach(drop -> ph.giveBlock(drop.getType(), drop.getAmount()));
+                    }
+                }
             }
-            block.setType(toPlace);
+            block.setType(toPlace != null ? toPlace : Material.AIR);
         }
         return true;
     }
@@ -228,6 +297,30 @@ public class BlockHelper {
                 }
             }, delay + 2);
         }
+    }
+
+    public void digBlocks(SegmentData data, int delay, PlayerHelper playerHelper) {
+
+        // Schedule the block placement
+        Bukkit.getScheduler().runTaskLater(this.plugin, task -> {
+            Location location = data.getBaseLocation();
+            int x = location.getBlockX();
+            int y = location.getBlockY();
+            int z = location.getBlockZ();
+            Block targetBlock = data.getWorld().getBlockAt(x, y, z);
+
+            mineAndReplace(null, targetBlock, playerHelper);
+
+            // Clear the air...
+            int clearance = data.getClearance();
+            for (int i = 0; i <= clearance; i++) {
+                Block airBlock = data.getWorld().getBlockAt(x, y + i, z);
+                if (!mineAndReplace(null, airBlock, playerHelper)) {
+                    continue;
+                }
+            }
+
+        }, delay);
     }
 
     /**
