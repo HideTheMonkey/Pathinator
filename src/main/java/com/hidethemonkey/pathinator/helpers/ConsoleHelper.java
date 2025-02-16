@@ -24,38 +24,54 @@
 
 package com.hidethemonkey.pathinator.helpers;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
+
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 
 public class ConsoleHelper {
     private static final ConsoleCommandSender CONSOLE = Bukkit.getServer().getConsoleSender();
 
+    public static void logMessage(String message) {
+        CONSOLE.sendMessage("");
+        CONSOLE.sendMessage(Component.text(message, NamedTextColor.DARK_AQUA));
+        CONSOLE.sendMessage("");
+    }
+
     public static void sendNewVersionNotice(String newVersion, String currentVersion) {
         CONSOLE.sendMessage("");
-        CONSOLE.sendMessage(
-                ChatColor.DARK_AQUA + "************************************************************************");
-        CONSOLE.sendMessage(ChatColor.DARK_AQUA + "* " + ChatColor.RESET + "A new version of " + ChatColor.BOLD
-                + "Pathinator" + ChatColor.RESET + " is available!");
-        CONSOLE.sendMessage(ChatColor.DARK_AQUA + "*");
-        CONSOLE.sendMessage(ChatColor.DARK_AQUA + "* " + ChatColor.RESET + "Current Version: " + currentVersion);
-        CONSOLE.sendMessage(
-                ChatColor.DARK_AQUA + "* " + ChatColor.RESET + ChatColor.BOLD + "New Version: " + newVersion);
-        CONSOLE.sendMessage(ChatColor.DARK_AQUA + "*");
-        CONSOLE.sendMessage(
-                ChatColor.DARK_AQUA + "* " + ChatColor.RESET
-                        + "Please update to take advantage of the latest features and bug fixes.");
-        CONSOLE.sendMessage(ChatColor.DARK_AQUA + "*");
-        CONSOLE.sendMessage(ChatColor.DARK_AQUA + "* " + ChatColor.RESET + "Download from your preferred site:");
-        CONSOLE.sendMessage(ChatColor.DARK_AQUA + "* " + ChatColor.RESET
-                + "     Hangar: https://hangar.papermc.io/HideTheMonkey/Pathinator");
-        CONSOLE.sendMessage(ChatColor.DARK_AQUA + "* " + ChatColor.RESET
-                + "     Modrinth: https://modrinth.com/plugin/pathinator");
-        CONSOLE.sendMessage(ChatColor.DARK_AQUA + "* " + ChatColor.RESET
-                + "     Spigot: https://www.spigotmc.org/resources/pathinator.118803");
-        CONSOLE.sendMessage(ChatColor.DARK_AQUA + "*");
-        CONSOLE.sendMessage(
-                ChatColor.DARK_AQUA + "************************************************************************");
+        CONSOLE.sendMessage(Component.text("************************************************************************",
+                NamedTextColor.DARK_AQUA));
+        CONSOLE.sendMessage(Component.text("* ",
+                NamedTextColor.DARK_AQUA).append(
+                        Component.text(
+                                "A new version of "))
+                .append(Component.text("Pathinator", Style.style(
+                        TextDecoration.BOLD)))
+                .append(Component.text(" is available!")));
+        CONSOLE.sendMessage(Component.text("*", NamedTextColor.DARK_AQUA));
+        CONSOLE.sendMessage(Component.text("* ", NamedTextColor.DARK_AQUA)
+                .append(Component.text("Current Version: " + currentVersion)));
+        CONSOLE.sendMessage(Component.text("* ", NamedTextColor.DARK_AQUA)
+                .append(Component.text("New Version: " + newVersion, Style.style(TextDecoration.BOLD))));
+        CONSOLE.sendMessage(Component.text("*", NamedTextColor.DARK_AQUA));
+        CONSOLE.sendMessage(Component.text("* ", NamedTextColor.DARK_AQUA)
+                .append(Component.text("Please update to take advantage of the latest features and bug fixes.")));
+        CONSOLE.sendMessage(Component.text("*", NamedTextColor.DARK_AQUA));
+        CONSOLE.sendMessage(Component.text("* ", NamedTextColor.DARK_AQUA)
+                .append(Component.text("Download from your preferred site:")));
+        CONSOLE.sendMessage(Component.text("*", NamedTextColor.DARK_AQUA)
+                .append(Component.text("     Hangar: https://hangar.papermc.io/HideTheMonkey/Pathinator")));
+        CONSOLE.sendMessage(Component.text("*", NamedTextColor.DARK_AQUA)
+                .append(Component.text("     Modrinth: https://modrinth.com/plugin/pathinator")));
+        CONSOLE.sendMessage(Component.text("*", NamedTextColor.DARK_AQUA)
+                .append(Component.text("     Spigot: https://www.spigotmc.org/resources/pathinator.118803")));
+        CONSOLE.sendMessage(Component.text("*", NamedTextColor.DARK_AQUA));
+        CONSOLE.sendMessage(Component.text("************************************************************************",
+                NamedTextColor.DARK_AQUA));
         CONSOLE.sendMessage("");
     }
 }

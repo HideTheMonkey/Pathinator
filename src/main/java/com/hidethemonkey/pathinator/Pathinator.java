@@ -54,7 +54,6 @@ import com.hidethemonkey.pathinator.commands.PathCommands;
 import com.hidethemonkey.pathinator.commands.TrackCommands;
 import com.hidethemonkey.pathinator.helpers.ConsoleHelper;
 import com.hidethemonkey.pathinator.helpers.FollowRegistry;
-import com.hidethemonkey.pathinator.helpers.StringHelper;
 import com.hidethemonkey.pathinator.helpers.VersionChecker;
 import com.hidethemonkey.pathinator.helpers.VersionData;
 import com.hidethemonkey.pathinator.listeners.PlayerMoveListener;
@@ -137,18 +136,16 @@ public class Pathinator extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new PlayerMoveListener(this, followRegistry), this);
             FollowCommands follow = new FollowCommands(this, followRegistry);
             new CommandTree(PathCommands.FOLLOW).withAliases("pf")
-                    .then(new LiteralArgument(
-                            PathCommands.START)
-                            .then(new IntegerArgument(
+                    .thenNested(new LiteralArgument(PathCommands.START),
+                            new IntegerArgument(
                                     PathCommands.RADIUS,
-                                    PathinatorConfig.MIN_RADIUS, PathinatorConfig.MAX_RADIUS)
-                                    .then(new BlockStateArgument(PathCommands.PATH_MATERIAL)
-                                            .executesPlayer((PlayerCommandExecutor) follow::createPath))))
-                    .then(new LiteralArgument(
-                            PathCommands.START)
-                            .then(new IntegerArgument(PathCommands.RADIUS, PathinatorConfig.MIN_RADIUS,
+                                    PathinatorConfig.MIN_RADIUS, PathinatorConfig.MAX_RADIUS),
+                            new BlockStateArgument(PathCommands.PATH_MATERIAL)
+                                    .executesPlayer((PlayerCommandExecutor) follow::createPath))
+                    .thenNested(new LiteralArgument(PathCommands.START),
+                            new IntegerArgument(PathCommands.RADIUS, PathinatorConfig.MIN_RADIUS,
                                     PathinatorConfig.MAX_RADIUS)
-                                    .executesPlayer((PlayerCommandExecutor) follow::createPath)))
+                                    .executesPlayer((PlayerCommandExecutor) follow::createPath))
                     .then(new LiteralArgument(
                             PathCommands.START)
                             .executesPlayer((PlayerCommandExecutor) follow::createPath))
@@ -273,9 +270,9 @@ public class Pathinator extends JavaPlugin {
             return;
         }
         DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(versionData.getVersion());
-        DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(getDescription().getVersion());
+        DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(getPluginMeta().getVersion());
         if (latestVersion.compareTo(currentVersion) > 0) {
-            ConsoleHelper.sendNewVersionNotice(versionData.getVersion(), getDescription().getVersion());
+            ConsoleHelper.sendNewVersionNotice(versionData.getVersion(), getPluginMeta().getVersion());
         }
     }
 
@@ -284,7 +281,7 @@ public class Pathinator extends JavaPlugin {
         public void onPlayerJoin(PlayerJoinEvent event) {
             getMetrics().addCustomChart(
                     new SimplePie("player_locale",
-                            () -> String.valueOf(StringHelper.formatLocale(event.getPlayer().getLocale()))));
+                            () -> String.valueOf(event.getPlayer().locale().toString())));
         }
     }
 

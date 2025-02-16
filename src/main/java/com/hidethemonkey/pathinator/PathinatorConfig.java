@@ -210,7 +210,7 @@ public class PathinatorConfig {
         if (configVersion == null || configVersion.isBlank()) {
             configVersion = "unknown";
         }
-        String currentVersion = plugin.getDescription().getVersion();
+        String currentVersion = plugin.getPluginMeta().getVersion();
         if (!currentVersion.equals(configVersion)) {
             // backup current config
             File sourceFile = new File(plugin.getDataFolder(), file.getName());
