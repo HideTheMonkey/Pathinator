@@ -30,21 +30,6 @@ import org.bukkit.Location;
 public class StringHelper {
 
     /**
-     * Standardize the format of user locale
-     * 
-     * @param locale
-     * @return
-     */
-    public static String formatLocale(String locale) {
-        String[] parts = locale.split("_");
-        if (parts.length == 2) {
-            // return the language and country in the format "language_COUNTRY"
-            return parts[0] + "_" + parts[1].toUpperCase();
-        }
-        return locale;
-    }
-
-    /**
      * Get the string representation of a location (for debugging)
      * 
      * @param location
