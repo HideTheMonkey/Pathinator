@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.hidethemonkey</groupId>
     <artifactId>Pathinator</artifactId>
-    <version>1.4.1</version>
+    <version>1.4.3</version>
     <packaging>jar</packaging>
     <name>Pathinator</name>
 
@@ -29,14 +29,14 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.4-R0.1-SNAPSHOT</version>
+            <version>1.21.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <!-- https://commandapi.jorel.dev/latest.html -->
+        <!-- https://github.com/CommandAPI/CommandAPI/releases/latest -->
         <dependency>
             <groupId>dev.jorel</groupId>
             <artifactId>commandapi-bukkit-shade</artifactId>
-            <version>9.7.0</version>
+            <version>10.1.2</version>
         </dependency>
         <!-- https://bstats.org/getting-started/include-metrics -->
         <dependency>
@@ -48,18 +48,19 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20250107</version>
+            <version>20250517</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.maven/maven-artifact -->
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-artifact</artifactId>
-            <version>3.9.9</version>
+            <version>3.9.11</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/net.kyori/adventure-api -->
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-api</artifactId>
-            <version>4.18.0</version>
+            <version>4.24.0</version>
         </dependency>
     </dependencies>
 
