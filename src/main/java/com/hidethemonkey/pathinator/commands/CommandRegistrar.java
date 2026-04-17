@@ -8,6 +8,7 @@ import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.executors.PlayerCommandExecutor;
+import net.kyori.adventure.text.Component;
 
 import com.hidethemonkey.pathinator.Pathinator;
 import com.hidethemonkey.pathinator.PathinatorConfig;
@@ -98,7 +99,7 @@ public class CommandRegistrar {
                         .withPermission("pathinator.admin")
                         .executesPlayer((PlayerCommandExecutor) (sender, args) -> {
                             plugin.reloadPlugin();
-                            sender.sendMessage("[" + plugin.getName() + "]: Config reloaded.");
+                            sender.sendMessage(Component.text("[" + plugin.getName() + "]: Config reloaded."));
                         }))
                 .register();
     }
