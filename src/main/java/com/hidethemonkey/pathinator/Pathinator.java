@@ -32,10 +32,6 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.hidethemonkey.pathinator.commands.CommandRegistrar;
@@ -43,6 +39,8 @@ import com.hidethemonkey.pathinator.helpers.ConsoleHelper;
 import com.hidethemonkey.pathinator.helpers.FollowRegistry;
 import com.hidethemonkey.pathinator.helpers.VersionChecker;
 import com.hidethemonkey.pathinator.helpers.VersionData;
+import com.hidethemonkey.pathinator.listeners.PlayerJoinListener;
+import com.hidethemonkey.pathinator.listeners.PlayerQuitListener;
 
 public class Pathinator extends JavaPlugin {
 
@@ -81,8 +79,8 @@ public class Pathinator extends JavaPlugin {
         setupMetrics(pConfig);
 
         // Register Player Join and Quit Listeners
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerQuitListener(followRegistry), this);
 
         CommandAPI.onEnable();
         CommandRegistrar.register(this, pConfig, followRegistry);
@@ -184,20 +182,4 @@ public class Pathinator extends JavaPlugin {
         }
     }
 
-    public class PlayerJoinListener implements Listener {
-        @EventHandler
-        public void onPlayerJoin(PlayerJoinEvent event) {
-            getMetrics().addCustomChart(
-                    new SimplePie("player_locale",
-                            () -> String.valueOf(event.getPlayer().locale().toString())));
-        }
-    }
-
-    public class PlayerQuitListener implements Listener {
-        @EventHandler
-        public void onPlayerQuit(PlayerQuitEvent event) {
-            // Clean up when players leave
-            followRegistry.remove(event.getPlayer());
-        }
-    }
 }
