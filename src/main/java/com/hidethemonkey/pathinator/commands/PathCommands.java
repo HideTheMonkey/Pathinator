@@ -196,7 +196,7 @@ public abstract class PathCommands {
     protected boolean modeCheck(PlayerHelper playerHelper) {
         // Check if the player is in the correct game mode
         if (playerHelper.isInAdventure() || playerHelper.isInSpectator()) {
-            playerHelper.msg("Pathinator does not work in " + playerHelper.getGameMode() + " mode.");
+            playerHelper.msg("Pathinator does not work in " + playerHelper.getPlayer().getGameMode().name() + " mode.");
             return false;
         }
         // Check if we're enabled in survival mode

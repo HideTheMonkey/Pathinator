@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.Tag;
@@ -63,50 +64,20 @@ public class PlayerHelper {
         return player;
     }
 
-    /**
-     * Get the player's game mode
-     * 
-     * @return
-     */
-    public String getGameMode() {
-        return player.getGameMode().name();
-    }
-
-    /**
-     * Return if the player is in survival mode
-     * 
-     * @return
-     */
     public boolean isInSurvival() {
-        return getGameMode().equals("SURVIVAL");
+        return player.getGameMode() == GameMode.SURVIVAL;
     }
 
-    /**
-     * Return if the player is in adventure mode
-     * 
-     * @return
-     */
     public boolean isInAdventure() {
-        return getGameMode().equals("ADVENTURE");
+        return player.getGameMode() == GameMode.ADVENTURE;
     }
 
-    /**
-     * Return if the player is in spectator mode
-     * 
-     * @return
-     */
     public boolean isInSpectator() {
-        return getGameMode().equals("SPECTATOR");
+        return player.getGameMode() == GameMode.SPECTATOR;
     }
 
-    /**
-     * Return if the player is in creative mode
-     * 
-     * @param block
-     * @return
-     */
     public boolean isInCreative() {
-        return getGameMode().equals("CREATIVE");
+        return player.getGameMode() == GameMode.CREATIVE;
     }
 
     /**
