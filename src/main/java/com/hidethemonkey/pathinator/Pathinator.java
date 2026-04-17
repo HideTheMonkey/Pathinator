@@ -102,6 +102,18 @@ public class Pathinator extends JavaPlugin {
         return pConfig;
     }
 
+    public void reloadPlugin() {
+        reloadConfig();
+        pConfig = new PathinatorConfig(getConfig());
+        pConfig.setPluginName(this.getName());
+        CommandAPI.unregister(PathCommands.BASIC);
+        CommandAPI.unregister(PathCommands.TRACKS);
+        CommandAPI.unregister(PathCommands.CUSTOM);
+        CommandAPI.unregister(PathCommands.FOLLOW);
+        CommandAPI.unregister(PathCommands.DIG);
+        CommandRegistrar.register(this, pConfig, followRegistry);
+    }
+
     /**
      * 
      * @return bstats metrics object
