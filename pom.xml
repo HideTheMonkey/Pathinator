@@ -29,7 +29,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.8-R0.1-SNAPSHOT</version>
+            <version>1.21.11-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- https://github.com/CommandAPI/CommandAPI/releases/latest -->
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20250517</version>
+            <version>20251224</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.maven/maven-artifact -->
         <dependency>
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-api</artifactId>
-            <version>4.24.0</version>
+            <version>4.26.1</version>
         </dependency>
     </dependencies>
 
@@ -78,7 +78,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.6.2</version>
                     <configuration>
                         <minimizeJar>true</minimizeJar>
                         <createDependencyReducedPom>false</createDependencyReducedPom>
@@ -115,7 +115,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.4.2</version>
+                    <version>3.5.0</version>
                     <configuration>
                         <archive>
                             <manifestEntries>
