@@ -46,7 +46,6 @@ public class Pathinator extends JavaPlugin {
 
     private PathinatorConfig pConfig;
     private Metrics metrics;
-    private VersionData versionData;
     private final FollowRegistry followRegistry = new FollowRegistry();
 
     /**
@@ -55,7 +54,6 @@ public class Pathinator extends JavaPlugin {
     @Override
     public void onLoad() {
         CommandAPI.onLoad(new CommandAPIBukkitConfig(this).verboseOutput(false));
-        versionData = VersionChecker.getLatestReleaseVersion();
     }
 
     /**
@@ -69,8 +67,9 @@ public class Pathinator extends JavaPlugin {
 
         pConfig = new PathinatorConfig(getConfig());
 
-        // Check for new versions
-        compareVersions();
+        // Check for new versions asynchronously to avoid blocking startup
+        getServer().getScheduler().runTaskAsynchronously(this,
+                () -> compareVersions(VersionChecker.getLatestReleaseVersion()));
 
         // Store name on config for easy access later (not saved to file)
         pConfig.setPluginName(this.getName());
@@ -169,7 +168,7 @@ public class Pathinator extends JavaPlugin {
     /**
      * 
      */
-    private void compareVersions() {
+    private void compareVersions(VersionData versionData) {
         if (versionData == null) {
             getLogger().warning(
                     "Could not check for new versions. Please see https://hangar.papermc.io/HideTheMonkey/Pathinator for updates.");
