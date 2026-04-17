@@ -35,6 +35,7 @@ import org.bstats.charts.SimplePie;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.hidethemonkey.pathinator.commands.CommandRegistrar;
+import com.hidethemonkey.pathinator.commands.PathCommands;
 import com.hidethemonkey.pathinator.helpers.ConsoleHelper;
 import com.hidethemonkey.pathinator.helpers.FollowRegistry;
 import com.hidethemonkey.pathinator.helpers.VersionChecker;
