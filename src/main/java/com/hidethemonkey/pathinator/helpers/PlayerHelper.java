@@ -29,7 +29,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.Tag;
@@ -48,6 +50,7 @@ public class PlayerHelper {
 
     Player player;
     Pathinator plugin;
+    private final Map<String, ItemStack> toolCache = new HashMap<>();
 
     public PlayerHelper(Player player, Pathinator plugin) {
         this.player = player;
@@ -63,50 +66,20 @@ public class PlayerHelper {
         return player;
     }
 
-    /**
-     * Get the player's game mode
-     * 
-     * @return
-     */
-    public String getGameMode() {
-        return player.getGameMode().name();
-    }
-
-    /**
-     * Return if the player is in survival mode
-     * 
-     * @return
-     */
     public boolean isInSurvival() {
-        return getGameMode().equals("SURVIVAL");
+        return player.getGameMode() == GameMode.SURVIVAL;
     }
 
-    /**
-     * Return if the player is in adventure mode
-     * 
-     * @return
-     */
     public boolean isInAdventure() {
-        return getGameMode().equals("ADVENTURE");
+        return player.getGameMode() == GameMode.ADVENTURE;
     }
 
-    /**
-     * Return if the player is in spectator mode
-     * 
-     * @return
-     */
     public boolean isInSpectator() {
-        return getGameMode().equals("SPECTATOR");
+        return player.getGameMode() == GameMode.SPECTATOR;
     }
 
-    /**
-     * Return if the player is in creative mode
-     * 
-     * @param block
-     * @return
-     */
     public boolean isInCreative() {
-        return getGameMode().equals("CREATIVE");
+        return player.getGameMode() == GameMode.CREATIVE;
     }
 
     /**
@@ -162,6 +135,10 @@ public class PlayerHelper {
             return null;
         }
 
+        if (toolCache.containsKey(type)) {
+            return toolCache.get(type);
+        }
+
         PlayerInventory inventory = player.getInventory();
         List<ItemStack> tools = new ArrayList<ItemStack>();
         for (ItemStack item : inventory.getContents()) {
@@ -169,6 +146,7 @@ public class PlayerHelper {
                 tools.add(item);
             }
         }
+        ItemStack result;
         if (!tools.isEmpty()) {
             // Sort tools by least amount of remaining durability
             Comparator<ItemStack> comp = (ItemStack a, ItemStack b) -> {
@@ -177,17 +155,19 @@ public class PlayerHelper {
                 return acomp - bcomp;
             };
             Collections.sort(tools, comp);
-
-            return tools.get(0);
+            result = tools.get(0);
+        } else {
+            // Player doesn't have a tool so pass back a wooden version, but with 0 amount.
+            // This is done so we know the material requires a tool but the player just
+            // doesn't have one.
+            Material fakeTool = Material.getMaterial("WOODEN_" + type);
+            if (fakeTool == null) {
+                fakeTool = material;
+            }
+            result = new ItemStack(fakeTool, 0);
         }
-        // Player doesn't have a tool so pass back a wooden version, but with 0 amount.
-        // This is done so we know the material requires a tool but the player just
-        // doesn't have one.
-        Material fakeTool = Material.getMaterial("WOODEN_" + type);
-        if (fakeTool == null) {
-            fakeTool = material;
-        }
-        return new ItemStack(fakeTool, 0);
+        toolCache.put(type, result);
+        return result;
     }
 
     /**

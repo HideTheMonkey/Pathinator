@@ -57,6 +57,10 @@ public class TrackCommands extends PathCommands {
         Player player = (Player) sender;
         PlayerHelper playerHelper = new PlayerHelper(player, plugin);
 
+        if (!permissionCheck(playerHelper, PERM_TRACKS)) {
+            return;
+        }
+
         // Check if the player is in a supported game mode
         if (!modeCheck(playerHelper)) {
             return;

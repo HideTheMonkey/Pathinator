@@ -64,9 +64,13 @@ public class FollowCommands extends PathCommands {
         PlayerHelper playerHelper = new PlayerHelper(player, plugin);
         BlockHelper blockHelper = new BlockHelper(plugin);
 
+        if (!permissionCheck(playerHelper, PERM_FOLLOW)) {
+            return;
+        }
+
         // Check if the player is in a supported game mode
         if (!playerHelper.isInCreative()) {
-            playerHelper.msg("/" + PathCommands.FOLLOW + " does not work in " + playerHelper.getGameMode() + " mode.");
+            playerHelper.msg("/" + PathCommands.FOLLOW + " does not work in " + playerHelper.getPlayer().getGameMode().name() + " mode.");
             return;
         }
 

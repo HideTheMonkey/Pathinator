@@ -27,6 +27,10 @@ public class DigCommands extends PathCommands {
         PlayerHelper playerHelper = new PlayerHelper(player, plugin);
         BlockHelper blockHelper = new BlockHelper(plugin);
 
+        if (!permissionCheck(playerHelper, PERM_DIG)) {
+            return;
+        }
+
         // Check if the player is in a supported game mode
         if (!modeCheck(playerHelper)) {
             return;
