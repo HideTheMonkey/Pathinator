@@ -92,5 +92,14 @@ public class CommandRegistrar {
                         .then(new IntegerArgument(PathCommands.DISTANCE)
                                 .executesPlayer((PlayerCommandExecutor) dig::createPath)))
                 .register();
+
+        new CommandAPICommand("pathinator")
+                .withSubcommand(new CommandAPICommand("reload")
+                        .withPermission("pathinator.admin")
+                        .executesPlayer((PlayerCommandExecutor) (sender, args) -> {
+                            plugin.reloadPlugin();
+                            sender.sendMessage("[" + plugin.getName() + "]: Config reloaded.");
+                        }))
+                .register();
     }
 }

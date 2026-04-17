@@ -4,3 +4,8 @@ version: ${project.version}
 api-version: 1.16
 author: HideTheMonkey
 main: com.hidethemonkey.pathinator.Pathinator
+
+permissions:
+  pathinator.admin:
+    description: Use admin commands (reload)
+    default: op
