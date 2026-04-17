@@ -43,6 +43,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 import com.hidethemonkey.pathinator.Pathinator;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -253,10 +254,10 @@ public class PlayerHelper {
 
     /**
      * Send a message to the player
-     * 
+     *
      * @param message
      */
     public void msg(String message) {
-        player.sendMessage("[" + plugin.getName() + "]: " + message);
+        player.sendMessage(Component.text("[" + plugin.getName() + "]: " + message));
     }
 }
