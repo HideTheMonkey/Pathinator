@@ -199,7 +199,9 @@ public class PlayerHelper {
     public void addToolDamage(ItemStack item) {
         if (item != null && item.getAmount() > 0 && plugin.getPConfig().getTakeToolDamage()) {
             String toolName = item.getType().name();
-            if (!toolName.contains("AXE") && !toolName.contains("SHOVEL") && !toolName.contains("HOE")) {
+            Material toolMaterial = item.getType();
+            if (!Tag.ITEMS_PICKAXES.isTagged(toolMaterial) && !Tag.ITEMS_SHOVELS.isTagged(toolMaterial)
+                    && !Tag.ITEMS_AXES.isTagged(toolMaterial) && !Tag.ITEMS_HOES.isTagged(toolMaterial)) {
                 return; // item is not a tool
             }
             int damage = 1;
