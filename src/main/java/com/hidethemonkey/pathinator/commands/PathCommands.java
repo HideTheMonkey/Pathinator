@@ -49,6 +49,14 @@ public abstract class PathCommands {
     public static final String FOLLOW = "path:follow";
     public static final String DIG = "path:dig";
 
+    // permissions
+    public static final String PERM_BASIC = "pathinator.basic";
+    public static final String PERM_TRACKS = "pathinator.tracks";
+    public static final String PERM_CUSTOM = "pathinator.custom";
+    public static final String PERM_FOLLOW = "pathinator.follow";
+    public static final String PERM_DIG = "pathinator.dig";
+    public static final String PERM_ADMIN = "pathinator.admin";
+
     // parameters
     public static final String DISTANCE = "distance";
     public static final String WIDTH = "width";
@@ -193,6 +201,14 @@ public abstract class PathCommands {
      * @param playerHelper The player helper instance.
      * @return True if the player is in the correct game mode, false otherwise.
      */
+    protected boolean permissionCheck(PlayerHelper playerHelper, String permission) {
+        if (!playerHelper.getPlayer().hasPermission(permission)) {
+            playerHelper.msg("You don't have permission to use this command.");
+            return false;
+        }
+        return true;
+    }
+
     protected boolean modeCheck(PlayerHelper playerHelper) {
         // Check if the player is in the correct game mode
         if (playerHelper.isInAdventure() || playerHelper.isInSpectator()) {

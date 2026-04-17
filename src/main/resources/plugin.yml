@@ -4,3 +4,23 @@ version: ${project.version}
 api-version: 1.16
 author: HideTheMonkey
 main: com.hidethemonkey.pathinator.Pathinator
+
+permissions:
+  pathinator.basic:
+    description: Use path:basic
+    default: op
+  pathinator.tracks:
+    description: Use path:tracks
+    default: op
+  pathinator.custom:
+    description: Use path:custom
+    default: op
+  pathinator.follow:
+    description: Use path:follow
+    default: op
+  pathinator.dig:
+    description: Use path:dig
+    default: op
+  pathinator.admin:
+    description: Use admin commands (reload)
+    default: op
