@@ -1,54 +1,45 @@
 package com.hidethemonkey.pathinator.helpers;
 
-import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class FollowRegistry {
-    private Map<UUID, Integer> players;
-    private Map<UUID, Material> materials;
+
+    record FollowState(int radius, Material material) {}
+
+    private Map<UUID, FollowState> registry;
 
     public FollowRegistry() {
-        Properties props = new Properties();
-        int MAX_PLAYERS = 20;
-        try {
-            props.load(new FileInputStream("server.properties"));
-            MAX_PLAYERS = Integer.parseInt(props.getProperty("max-players"));
-        } catch (Exception e) {
-            // ignore
-        }
-        players = new HashMap<>(MAX_PLAYERS);
-        materials = new HashMap<>(MAX_PLAYERS);
+        registry = new HashMap<>();
     }
 
     public void register(Player player, Integer radius, Material material) {
-        players.put(player.getUniqueId(), radius);
-        materials.put(player.getUniqueId(), material);
+        registry.put(player.getUniqueId(), new FollowState(radius, material));
     }
 
     public void remove(Player player) {
-        players.remove(player.getUniqueId());
-        materials.remove(player.getUniqueId());
+        registry.remove(player.getUniqueId());
     }
 
     public Integer getRadius(Player player) {
-        return players.get(player.getUniqueId());
+        FollowState state = registry.get(player.getUniqueId());
+        return state != null ? state.radius() : null;
     }
 
     public Material getMaterial(Player player) {
-        return materials.get(player.getUniqueId());
+        FollowState state = registry.get(player.getUniqueId());
+        return state != null ? state.material() : null;
     }
 
     public boolean isRegistered(Player player) {
-        return players.containsKey(player.getUniqueId());
+        return registry.containsKey(player.getUniqueId());
     }
 
     public int size() {
-        return players.size();
+        return registry.size();
     }
 }
