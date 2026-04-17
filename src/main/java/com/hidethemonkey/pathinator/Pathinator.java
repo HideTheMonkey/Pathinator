@@ -26,14 +26,6 @@ package com.hidethemonkey.pathinator;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIBukkitConfig;
-import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.CommandTree;
-import dev.jorel.commandapi.arguments.BlockStateArgument;
-import dev.jorel.commandapi.arguments.BooleanArgument;
-import dev.jorel.commandapi.arguments.IntegerArgument;
-import dev.jorel.commandapi.arguments.LiteralArgument;
-import dev.jorel.commandapi.arguments.StringArgument;
-import dev.jorel.commandapi.executors.PlayerCommandExecutor;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
@@ -46,17 +38,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.hidethemonkey.pathinator.commands.BasicCommands;
-import com.hidethemonkey.pathinator.commands.CustomCommands;
-import com.hidethemonkey.pathinator.commands.DigCommands;
-import com.hidethemonkey.pathinator.commands.FollowCommands;
-import com.hidethemonkey.pathinator.commands.PathCommands;
-import com.hidethemonkey.pathinator.commands.TrackCommands;
+import com.hidethemonkey.pathinator.commands.CommandRegistrar;
 import com.hidethemonkey.pathinator.helpers.ConsoleHelper;
 import com.hidethemonkey.pathinator.helpers.FollowRegistry;
 import com.hidethemonkey.pathinator.helpers.VersionChecker;
 import com.hidethemonkey.pathinator.helpers.VersionData;
-import com.hidethemonkey.pathinator.listeners.PlayerMoveListener;
 
 public class Pathinator extends JavaPlugin {
 
@@ -99,85 +85,7 @@ public class Pathinator extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
 
         CommandAPI.onEnable();
-
-        // Create basic path command
-        BasicCommands basic = new BasicCommands(this);
-        new CommandAPICommand(PathCommands.BASIC)
-                .withAliases("pb")
-                .withArguments(new IntegerArgument(PathCommands.DISTANCE))
-                .withOptionalArguments(new BooleanArgument(PathCommands.WITH_LIGHTS))
-                .executesPlayer((PlayerCommandExecutor) basic::createPath)
-                .register();
-
-        // Create track path command
-        TrackCommands track = new TrackCommands(this);
-        new CommandAPICommand(PathCommands.TRACKS)
-                .withAliases("pt")
-                .withArguments(new IntegerArgument(PathCommands.DISTANCE))
-                .withOptionalArguments(new BooleanArgument(PathCommands.WITH_POWER))
-                .withOptionalArguments(new BooleanArgument(PathCommands.WITH_LIGHTS))
-                .executesPlayer((PlayerCommandExecutor) track::createPath)
-                .register();
-
-        // Create custom path command
-        CustomCommands custom = new CustomCommands(this);
-        new CommandAPICommand(PathCommands.CUSTOM)
-                .withAliases("pc")
-                .withArguments(new IntegerArgument(PathCommands.DISTANCE))
-                .withArguments(new IntegerArgument(PathCommands.WIDTH))
-                .withArguments(new IntegerArgument(PathCommands.HEIGHT))
-                .withOptionalArguments(new BlockStateArgument(PathCommands.PATH_MATERIAL))
-                .withOptionalArguments(new BlockStateArgument(PathCommands.CLEARANCE_MATERIAL))
-                .executesPlayer((PlayerCommandExecutor) custom::createPath)
-                .register();
-
-        // Register Player Move Listener only if enbabled
-        if (pConfig.getFollowEnabled()) {
-            getServer().getPluginManager().registerEvents(new PlayerMoveListener(this, followRegistry), this);
-            FollowCommands follow = new FollowCommands(this, followRegistry);
-            new CommandTree(PathCommands.FOLLOW).withAliases("pf")
-                    .thenNested(new LiteralArgument(PathCommands.START),
-                            new IntegerArgument(
-                                    PathCommands.RADIUS,
-                                    PathinatorConfig.MIN_RADIUS, PathinatorConfig.MAX_RADIUS),
-                            new BlockStateArgument(PathCommands.PATH_MATERIAL)
-                                    .executesPlayer((PlayerCommandExecutor) follow::createPath))
-                    .thenNested(new LiteralArgument(PathCommands.START),
-                            new IntegerArgument(PathCommands.RADIUS, PathinatorConfig.MIN_RADIUS,
-                                    PathinatorConfig.MAX_RADIUS)
-                                    .executesPlayer((PlayerCommandExecutor) follow::createPath))
-                    .then(new LiteralArgument(
-                            PathCommands.START)
-                            .executesPlayer((PlayerCommandExecutor) follow::createPath))
-                    .then(new LiteralArgument(
-                            PathCommands.STOP)
-                            .executesPlayer((PlayerCommandExecutor) follow::stopFollowing))
-                    .register();
-        }
-
-        DigCommands dig = new DigCommands(this);
-        new CommandTree(PathCommands.DIG).withAliases("pd")
-                .then(new StringArgument(
-                        PathCommands.UP)
-                        .then(new IntegerArgument(PathCommands.DISTANCE)
-                                .executesPlayer((PlayerCommandExecutor) dig::createPath)))
-                .then(new StringArgument(
-                        PathCommands.DOWN)
-                        .then(new IntegerArgument(PathCommands.DISTANCE)
-                                .executesPlayer((PlayerCommandExecutor) dig::createPath)))
-                .then(new StringArgument(
-                        PathCommands.AHEAD)
-                        .then(new IntegerArgument(PathCommands.DISTANCE)
-                                .executesPlayer((PlayerCommandExecutor) dig::createPath)))
-                .then(new StringArgument(
-                        PathCommands.VUP)
-                        .then(new IntegerArgument(PathCommands.DISTANCE)
-                                .executesPlayer((PlayerCommandExecutor) dig::createPath)))
-                .then(new StringArgument(
-                        PathCommands.VDOWN)
-                        .then(new IntegerArgument(PathCommands.DISTANCE)
-                                .executesPlayer((PlayerCommandExecutor) dig::createPath)))
-                .register();
+        CommandRegistrar.register(this, pConfig, followRegistry);
     }
 
     /**
