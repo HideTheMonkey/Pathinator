@@ -25,7 +25,7 @@
 package com.hidethemonkey.pathinator;
 
 import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.CommandAPIBukkitConfig;
+import dev.jorel.commandapi.CommandAPIPaperConfig;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
@@ -39,7 +39,6 @@ import com.hidethemonkey.pathinator.commands.PathCommands;
 import com.hidethemonkey.pathinator.helpers.ConsoleHelper;
 import com.hidethemonkey.pathinator.helpers.FollowRegistry;
 import com.hidethemonkey.pathinator.helpers.VersionChecker;
-import com.hidethemonkey.pathinator.helpers.VersionData;
 import com.hidethemonkey.pathinator.listeners.PlayerJoinListener;
 import com.hidethemonkey.pathinator.listeners.PlayerQuitListener;
 
@@ -54,12 +53,12 @@ public class Pathinator extends JavaPlugin {
      */
     @Override
     public void onLoad() {
-        CommandAPI.onLoad(new CommandAPIBukkitConfig(this).verboseOutput(false));
+        CommandAPI.onLoad(new CommandAPIPaperConfig(this).verboseOutput(false));
     }
 
     /**
-    *
-    */
+     *
+     */
     @Override
     public void onEnable() {
         // Do this first, in case we're upgrading from an older version
@@ -71,9 +70,6 @@ public class Pathinator extends JavaPlugin {
         // Check for new versions asynchronously to avoid blocking startup
         getServer().getScheduler().runTaskAsynchronously(this,
                 () -> compareVersions(VersionChecker.getLatestReleaseVersion()));
-
-        // Store name on config for easy access later (not saved to file)
-        pConfig.setPluginName(this.getName());
 
         // Initialize bStats metrics
         setupMetrics(pConfig);
@@ -106,7 +102,6 @@ public class Pathinator extends JavaPlugin {
     public void reloadPlugin() {
         reloadConfig();
         pConfig = new PathinatorConfig(getConfig());
-        pConfig.setPluginName(this.getName());
         CommandAPI.unregister(PathCommands.BASIC);
         CommandAPI.unregister(PathCommands.TRACKS);
         CommandAPI.unregister(PathCommands.CUSTOM);
@@ -181,16 +176,16 @@ public class Pathinator extends JavaPlugin {
     /**
      * 
      */
-    private void compareVersions(VersionData versionData) {
-        if (versionData == null) {
+    private void compareVersions(String latestReleaseVersion) {
+        if (latestReleaseVersion == null) {
             getLogger().warning(
                     "Could not check for new versions. Please see https://hangar.papermc.io/HideTheMonkey/Pathinator for updates.");
             return;
         }
-        DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(versionData.getVersion());
+        DefaultArtifactVersion latestVersion = new DefaultArtifactVersion(latestReleaseVersion);
         DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(getPluginMeta().getVersion());
         if (latestVersion.compareTo(currentVersion) > 0) {
-            ConsoleHelper.sendNewVersionNotice(versionData.getVersion(), getPluginMeta().getVersion());
+            ConsoleHelper.sendNewVersionNotice(latestReleaseVersion, getPluginMeta().getVersion());
         }
     }
 

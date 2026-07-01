@@ -38,7 +38,6 @@ import java.util.logging.Level;
 
 public class PathinatorConfig {
     private final FileConfiguration config;
-    private String pluginName = "";
 
     public static final String ENABLE_STATS = "enableStats";
     public static final int MIN_RADIUS = 0;
@@ -51,22 +50,6 @@ public class PathinatorConfig {
         this.config = fileConf;
         config.addDefault(ENABLE_STATS, true);
         config.options().copyDefaults(true);
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getPluginName() {
-        return pluginName;
-    }
-
-    /**
-     *
-     * @param name
-     */
-    public void setPluginName(String name) {
-        pluginName = name;
     }
 
     /**

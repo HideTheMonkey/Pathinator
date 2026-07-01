@@ -34,22 +34,18 @@ import org.json.JSONObject;
 
 public class VersionChecker {
 
-    public static VersionData getLatestReleaseVersion() {
+    public static String getLatestReleaseVersion() {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.github.com/repos/hidethemonkey/pathinator/releases/latest"))
                 .build();
 
-        HttpResponse<String> response;
-        VersionData version = null;
+        String version = null;
         try {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response != null && response.statusCode() == 200) {
-                JSONObject obj = new JSONObject(response.body());
-                version = new VersionData(obj.getString("tag_name"),
-                        obj.getJSONArray("assets").getJSONObject(0).getString("browser_download_url"),
-                        obj.getString("published_at"));
+                version = new JSONObject(response.body()).getString("tag_name");
             }
         } catch (IOException | InterruptedException e) {
             // do nothing

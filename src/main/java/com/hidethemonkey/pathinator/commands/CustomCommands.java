@@ -43,11 +43,8 @@ import com.hidethemonkey.pathinator.helpers.SegmentData.Section;
 
 public class CustomCommands extends PathCommands {
 
-    Pathinator plugin;
-
     public CustomCommands(Pathinator pathPlugin) {
         super(pathPlugin);
-        this.plugin = pathPlugin;
     }
 
     /**
@@ -125,11 +122,9 @@ public class CustomCommands extends PathCommands {
             }
             // otherwise, fill the left and right materials with the path material
             else {
-                leftMaterials.ensureCapacity(blocksLeft);
                 for (int i = 0; i < blocksLeft; i++) {
                     leftMaterials.add(pathMaterial);
                 }
-                rightMaterials.ensureCapacity(blocksRight);
                 for (int i = 0; i < blocksRight; i++) {
                     rightMaterials.add(pathMaterial);
                 }
