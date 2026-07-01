@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
@@ -157,7 +158,8 @@ public abstract class PathCommands {
      * @return The path material.
      */
     protected Material getPathMaterial(CommandArguments args, BlockData targetData) {
-        return ((BlockData) args.getOrDefault(PATH_MATERIAL, targetData)).getMaterial();
+        BlockState state = (BlockState) args.get(PATH_MATERIAL);
+        return state != null ? state.getType() : targetData.getMaterial();
     }
 
     /**
@@ -168,9 +170,9 @@ public abstract class PathCommands {
      * @return The clearance material.
      */
     protected Material getClearanceMaterial(CommandArguments args, String configMaterial) {
-        BlockData clearanceData = (BlockData) args.get(CLEARANCE_MATERIAL);
-        if (clearanceData != null) {
-            return clearanceData.getMaterial();
+        BlockState clearanceState = (BlockState) args.get(CLEARANCE_MATERIAL);
+        if (clearanceState != null) {
+            return clearanceState.getType();
         }
         return Material.getMaterial(configMaterial);
     }

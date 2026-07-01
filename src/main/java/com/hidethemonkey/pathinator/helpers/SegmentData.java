@@ -46,7 +46,6 @@ public class SegmentData {
     private int sideIndex;
     // BoundingBox that represents where no blocks should be placed
     private BoundingBox negativeSpace;
-    private BoundingBox emptyBox = new BoundingBox(0, 0, 0, 0, 0, 0);
     // Lighting
     private BlockFace lightFacing;
     private Location lightingLocation;
@@ -329,10 +328,7 @@ public class SegmentData {
      * @return the negative space
      */
     public BoundingBox getNegativeSpace() {
-        if (negativeSpace == null) {
-            return emptyBox;
-        }
-        return negativeSpace;
+        return negativeSpace != null ? negativeSpace : new BoundingBox();
     }
 
     /**
