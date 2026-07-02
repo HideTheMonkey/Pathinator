@@ -55,6 +55,7 @@ public class BasicCommands extends PathCommands {
 
     @Override
     public void createPath(CommandSender sender, CommandArguments args) {
+        hintShortcut(sender, args, BASIC, "pb");
         Player player = (Player) sender;
 
         // init some helpers

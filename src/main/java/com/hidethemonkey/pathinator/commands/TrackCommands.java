@@ -54,6 +54,7 @@ public class TrackCommands extends PathCommands {
      */
     @Override
     public void createPath(CommandSender sender, CommandArguments args) {
+        hintShortcut(sender, args, TRACKS, "pt");
         Player player = (Player) sender;
         PlayerHelper playerHelper = new PlayerHelper(player, plugin);
 

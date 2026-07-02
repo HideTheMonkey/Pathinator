@@ -21,6 +21,7 @@ public class DigCommands extends PathCommands {
 
     @Override
     public void createPath(CommandSender sender, CommandArguments args) {
+        hintShortcut(sender, args, DIG, "pd");
         Player player = (Player) sender;
 
         // init some helpers

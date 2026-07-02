@@ -54,6 +54,7 @@ public class CustomCommands extends PathCommands {
      */
     @Override
     public void createPath(CommandSender sender, CommandArguments args) {
+        hintShortcut(sender, args, CUSTOM, "pc");
         Player player = (Player) sender;
         PlayerHelper playerHelper = new PlayerHelper(player, plugin);
 

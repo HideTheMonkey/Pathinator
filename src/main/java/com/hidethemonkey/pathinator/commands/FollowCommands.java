@@ -58,6 +58,7 @@ public class FollowCommands extends PathCommands {
      */
     @Override
     public void createPath(CommandSender sender, CommandArguments args) {
+        hintShortcut(sender, args, FOLLOW, "pf");
         Player player = (Player) sender;
 
         // init some helpers
@@ -96,6 +97,7 @@ public class FollowCommands extends PathCommands {
      * @param args
      */
     public void stopFollowing(CommandSender sender, CommandArguments args) {
+        hintShortcut(sender, args, FOLLOW, "pf");
         Player player = (Player) sender;
         followRegistry.remove(player);
     }

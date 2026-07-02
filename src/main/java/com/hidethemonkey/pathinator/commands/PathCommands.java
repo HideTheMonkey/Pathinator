@@ -41,6 +41,9 @@ import com.hidethemonkey.pathinator.PathinatorConfig;
 import com.hidethemonkey.pathinator.helpers.BlockHelper;
 import com.hidethemonkey.pathinator.helpers.PlayerHelper;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 public abstract class PathCommands {
 
     // primary commands
@@ -268,6 +271,26 @@ public abstract class PathCommands {
             }
         }
         return lightingStack;
+    }
+
+    /**
+     * Sends a hint to use the shortcut alias when the player typed out the full
+     * command name instead.
+     *
+     * @param sender   The command sender.
+     * @param args     The command arguments.
+     * @param fullName The full command name (e.g. "path:basic").
+     * @param alias    The shortcut alias (e.g. "pb").
+     */
+    protected void hintShortcut(CommandSender sender, CommandArguments args, String fullName, String alias) {
+        String label = args.fullInput().split(" ")[0];
+        if (label.equalsIgnoreCase("/" + fullName)) {
+            sender.sendMessage(
+                    Component.text("[" + plugin.getName() + "]: ", NamedTextColor.DARK_AQUA)
+                            .append(Component.text("Tip: ", NamedTextColor.GRAY))
+                            .append(Component.text("you can use /" + alias, NamedTextColor.GOLD))
+                            .append(Component.text(" instead of /" + fullName + ".", NamedTextColor.GRAY)));
+        }
     }
 
     /**
