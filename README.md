@@ -116,6 +116,41 @@ follow:
 
 ```
 
+## Permissions
+
+Pathinator registers a permission node per command:
+
+| Permission | Command |
+|---|---|
+| `pathinator.basic` | `path:basic` / `pb` |
+| `pathinator.tracks` | `path:tracks` / `pt` |
+| `pathinator.custom` | `path:custom` / `pc` |
+| `pathinator.follow` | `path:follow` / `pf` |
+| `pathinator.dig` | `path:dig` / `pd` |
+| `pathinator.admin` | `/pathinator reload` |
+
+If you're using [LuckPerms](https://luckperms.net/), you can grant these individually:
+
+```
+/lp user <user> permission set pathinator.basic true
+/lp user <user> permission set pathinator.tracks true
+/lp user <user> permission set pathinator.custom true
+/lp user <user> permission set pathinator.follow true
+/lp user <user> permission set pathinator.dig true
+```
+
+Or grant everything to a group at once:
+
+```
+/lp group default permission set pathinator.* true
+```
+
+To restrict admin-only commands to staff:
+
+```
+/lp group staff permission set pathinator.admin true
+```
+
 ## Building from Source
 
 Run `mvn clean package shade:shade` from the root directory. This will create `target/Pathinator-<version>.jar` which you can then drop in your plugins folder.
@@ -131,7 +166,7 @@ _The metrics can be disabled in config.yml if you really want, but please consid
 - ~~Add option to create a path with rail tracks `path:tracks ...`~~ (v1.1.0)
 - ~~Add option to customize aspects of the path (height, width, material, etc...) `path:custom ...`~~ (v1.2.0)
 - Add option to follow the natural terrain instead of laying it all on the same Y value.
-- Add permissions management with LuckPerms
+- ~~Add permissions management with LuckPerms~~
 
 ## License
 
